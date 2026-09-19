@@ -21,9 +21,7 @@
                         brandRed: '#f87171',
                         brandPurple: '#a855f7'
                     },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif']
-                    }
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
             }
         }
@@ -40,6 +38,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <!-- Firebase Realtime Database SDKs (Compat version for lightweight integration) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -47,21 +49,10 @@
             color: #f1f5f9;
         }
 
-        /* Custom Scrollbars */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #475569;
-        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
         .glass-panel {
             background: rgba(15, 23, 42, 0.75);
@@ -81,17 +72,6 @@
             background: rgba(56, 189, 248, 0.08);
         }
 
-        /* Pulse glow animation for goal markers */
-        @keyframes pulseGlow {
-            0% { transform: scale(1); opacity: 0.9; }
-            50% { transform: scale(1.25); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.9; }
-        }
-        .animate-pulse-glow {
-            animation: pulseGlow 2s infinite ease-in-out;
-        }
-
-        /* Dynamic tooltip positioning */
         #pitchTooltip {
             pointer-events: none;
             transition: opacity 0.15s ease, transform 0.1s ease;
@@ -131,7 +111,7 @@
                                 <i id="selectedTeamFallbackIcon" class="fa-solid fa-flag text-xs"></i>
                             </span>
                             <select id="primaryTeamSelect" class="w-full pl-9 pr-8 py-2 bg-slate-800/90 text-sm font-medium border border-slate-700/80 rounded-xl text-white focus:ring-2 focus:ring-cyan-500 focus:outline-none appearance-none cursor-pointer hover:border-slate-600 transition">
-                                <!-- Options populated dynamically by JS -->
+                                <!-- Options populated dynamically -->
                             </select>
                             <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
                                 <i class="fa-solid fa-chevron-down text-xs"></i>
@@ -167,6 +147,11 @@
                     <i class="fa-solid fa-code-compare"></i>
                     <span>Head-to-Head Matchup Tool</span>
                 </button>
+                <button onclick="switchTab('analytics')" id="tab-analytics" class="tab-btn px-4 py-3 text-xs sm:text-sm font-medium text-slate-400 border-b-2 border-transparent hover:text-amber-400 flex items-center space-x-2 whitespace-nowrap transition border-l border-slate-800/60 ml-auto">
+                    <i class="fa-solid fa-chart-pie text-amber-400"></i>
+                    <span>Usage & Admin Insights</span>
+                    <i class="fa-solid fa-lock text-[10px] text-amber-400 ml-1"></i>
+                </button>
             </nav>
         </div>
     </header>
@@ -176,10 +161,7 @@
 
         <!-- ================= TAB 1: TACTICAL PITCH VISUALIZER ================= -->
         <section id="view-pitch" class="space-y-6">
-            <!-- Pitch Top Controls Grid -->
             <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-                
-                <!-- Tactical View Modes -->
                 <div class="md:col-span-6 bg-slate-900/80 p-1.5 rounded-2xl border border-slate-800 flex items-center space-x-1">
                     <button onclick="setPitchMode('heatmap')" id="mode-heatmap" class="flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center space-x-1.5 bg-cyan-500 text-slate-950 shadow-md">
                         <i class="fa-solid fa-fire"></i>
@@ -195,7 +177,6 @@
                     </button>
                 </div>
 
-                <!-- Opponent & Strategy Selector -->
                 <div class="md:col-span-6 grid grid-cols-2 gap-3">
                     <div class="relative">
                         <label class="text-[10px] uppercase tracking-wider font-semibold text-slate-400 block mb-1">Opponent</label>
@@ -216,7 +197,6 @@
                 </div>
             </div>
 
-            <!-- Interactive Tactical Pitch Canvas Panel -->
             <div class="glass-panel rounded-3xl p-4 sm:p-6 relative overflow-hidden border border-slate-800">
                 <div class="flex flex-col lg:flex-row items-center justify-between mb-4 gap-4">
                     <div class="flex items-center space-x-3">
@@ -226,19 +206,18 @@
                         </h2>
                     </div>
 
-                    <!-- Telemetry Stats Strip -->
                     <div class="flex flex-wrap items-center gap-3 text-xs">
                         <div class="bg-slate-800/90 px-3 py-1.5 rounded-xl border border-slate-700/60">
                             <span class="text-slate-400">Total Passes:</span>
-                            <span id="statPassCount" class="font-bold text-cyan-400 ml-1">482</span>
+                            <span id="statPassCount" class="font-bold text-cyan-400 ml-1">0</span>
                         </div>
                         <div class="bg-slate-800/90 px-3 py-1.5 rounded-xl border border-slate-700/60">
                             <span class="text-slate-400">Pass Acc:</span>
-                            <span id="statPassAcc" class="font-bold text-emerald-400 ml-1">87.4%</span>
+                            <span id="statPassAcc" class="font-bold text-emerald-400 ml-1">0.0%</span>
                         </div>
                         <div class="bg-slate-800/90 px-3 py-1.5 rounded-xl border border-slate-700/60">
                             <span class="text-slate-400">Shots (xG):</span>
-                            <span id="statShotsXg" class="font-bold text-amber-400 ml-1">14 (2.18 xG)</span>
+                            <span id="statShotsXg" class="font-bold text-amber-400 ml-1">0 (0.00 xG)</span>
                         </div>
                         <button onclick="regeneratePitchData()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center space-x-1.5 transition">
                             <i class="fa-solid fa-arrows-rotate"></i>
@@ -247,22 +226,14 @@
                     </div>
                 </div>
 
-                <!-- Canvas Pitch Container -->
                 <div class="relative w-full aspect-[12/8] max-h-[580px] bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 flex items-center justify-center shadow-2xl">
                     <canvas id="pitchCanvas" class="w-full h-full cursor-crosshair block"></canvas>
-                    
-                    <!-- Dynamic Canvas Floating Tooltip -->
-                    <div id="pitchTooltip" class="absolute hidden opacity-0 bg-slate-900/95 text-white text-xs px-3 py-2 rounded-xl border border-cyan-500/40 shadow-xl backdrop-blur-md z-30">
-                        <!-- Populated on hover over shot / pass nodes -->
-                    </div>
 
-                    <!-- Pitch Mode Info Legend Overlay -->
-                    <div id="pitchLegend" class="absolute bottom-3 right-3 bg-slate-900/90 border border-slate-800 backdrop-blur-md px-3 py-2 rounded-xl text-[11px] text-slate-300 flex items-center space-x-4 pointer-events-none">
-                        <!-- Populated based on mode -->
-                    </div>
+                    <div id="pitchTooltip" class="absolute hidden opacity-0 bg-slate-900/95 text-white text-xs px-3 py-2 rounded-xl border border-cyan-500/40 shadow-xl backdrop-blur-md z-30"></div>
+
+                    <div id="pitchLegend" class="absolute bottom-3 right-3 bg-slate-900/90 border border-slate-800 backdrop-blur-md px-3 py-2 rounded-xl text-[11px] text-slate-300 flex items-center space-x-4 pointer-events-none"></div>
                 </div>
 
-                <!-- Tactical Insights & Analytical Summary Grid -->
                 <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div class="glass-card p-4 rounded-2xl">
                         <div class="flex items-center space-x-2 text-cyan-400 mb-1">
@@ -270,7 +241,7 @@
                             <span class="text-xs font-bold uppercase tracking-wider">Field Dominance</span>
                         </div>
                         <p id="insightDominance" class="text-xs text-slate-300 leading-relaxed">
-                            Argentina controls 64% of progression vector corridors in the opposition final third.
+                            Awaiting real-time telemetry generation...
                         </p>
                     </div>
                     <div class="glass-card p-4 rounded-2xl">
@@ -279,7 +250,7 @@
                             <span class="text-xs font-bold uppercase tracking-wider">Shot Creation Index</span>
                         </div>
                         <p id="insightShots" class="text-xs text-slate-300 leading-relaxed">
-                            Average shot distance is 14.2 yards with a high conversion frequency from central box channels.
+                            Awaiting real-time telemetry generation...
                         </p>
                     </div>
                     <div class="glass-card p-4 rounded-2xl">
@@ -288,7 +259,7 @@
                             <span class="text-xs font-bold uppercase tracking-wider">Counter Vulnerability</span>
                         </div>
                         <p id="insightVulnerability" class="text-xs text-slate-300 leading-relaxed">
-                            Low turnover rate in central midfield provides 88% defensive structural stability.
+                            Awaiting real-time telemetry generation...
                         </p>
                     </div>
                 </div>
@@ -297,7 +268,6 @@
 
         <!-- ================= TAB 2: MONTE CARLO SIMULATOR ENGINE ================= -->
         <section id="view-simulator" class="hidden space-y-6">
-            <!-- Simulator Control Banner -->
             <div class="glass-panel p-6 rounded-3xl border border-slate-800 relative overflow-hidden">
                 <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
                     <div class="space-y-1">
@@ -315,7 +285,6 @@
                         </p>
                     </div>
 
-                    <!-- Simulator Controls -->
                     <div class="w-full lg:w-auto bg-slate-900/90 p-4 rounded-2xl border border-slate-800 space-y-3 flex-shrink-0">
                         <div class="flex items-center justify-between space-x-4">
                             <label class="text-xs font-semibold text-slate-300">Simulation Iterations:</label>
@@ -333,14 +302,9 @@
                 </div>
             </div>
 
-            <!-- Group Match Simulation Probability Cards -->
-            <div id="simMatchCardsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- Group fixtures simulated results inserted here -->
-            </div>
+            <div id="simMatchCardsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
 
-            <!-- Simulation Visual Breakdown Charts -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <!-- Group Probability Bar Chart -->
                 <div class="lg:col-span-7 glass-panel p-6 rounded-3xl border border-slate-800">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-sm sm:text-base font-bold text-white flex items-center space-x-2">
@@ -354,7 +318,6 @@
                     </div>
                 </div>
 
-                <!-- Scoreline Probability Matrix -->
                 <div class="lg:col-span-5 glass-panel p-6 rounded-3xl border border-slate-800 flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between mb-4">
@@ -365,19 +328,16 @@
                             <span class="text-xs text-slate-400">Primary Match</span>
                         </div>
 
-                        <div id="scorelineMatrixList" class="space-y-2 text-xs">
-                            <!-- Populated dynamically -->
-                        </div>
+                        <div id="scorelineMatrixList" class="space-y-2 text-xs"></div>
                     </div>
 
                     <div class="mt-4 pt-4 border-t border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
-                        <span>Model: Poisson ($\lambda_{team} = 1.4 + \Delta R / 350$)</span>
+                        <span>Model: Poisson (&lambda;<sub>team</sub> = 1.4 + &Delta;R / 350)</span>
                         <span class="text-emerald-400 font-semibold"><i class="fa-solid fa-check-circle mr-1"></i> Converged</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Goal Distribution Histogram Chart -->
             <div class="glass-panel p-6 rounded-3xl border border-slate-800">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-sm sm:text-base font-bold text-white flex items-center space-x-2">
@@ -393,7 +353,6 @@
 
         <!-- ================= TAB 3: GROUP STAGE & SCHEDULES ================= -->
         <section id="view-groups" class="hidden space-y-6">
-            <!-- Group Header & Filter Selector Bar -->
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 glass-panel p-4 rounded-2xl border border-slate-800">
                 <div class="flex items-center space-x-3">
                     <div class="p-2.5 rounded-xl bg-slate-800 text-cyan-400 border border-slate-700">
@@ -405,7 +364,6 @@
                     </div>
                 </div>
 
-                <!-- Group Selector Filter Tabs -->
                 <div class="flex items-center space-x-2 w-full sm:w-auto overflow-x-auto no-scrollbar">
                     <select id="groupFilterSelect" onchange="renderGroupStageView()" class="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:ring-1 focus:ring-cyan-500 font-medium">
                         <option value="ALL">Show Selected Group (Auto)</option>
@@ -430,13 +388,11 @@
                 </div>
             </div>
 
-            <!-- Group Standings & Schedule Split View -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <!-- Standings Table Panel -->
                 <div class="lg:col-span-7 glass-panel p-6 rounded-3xl border border-slate-800 space-y-4">
                     <div class="flex items-center justify-between">
                         <h3 id="groupTableTitle" class="text-base font-bold text-white flex items-center space-x-2">
-                            <span>Group J Standings Projections</span>
+                            <span>Group Standings Projections</span>
                         </h3>
                         <span class="text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-semibold border border-slate-700">
                             Simulated Table
@@ -457,42 +413,34 @@
                                     <th class="py-3 px-2 text-center">Adv. %</th>
                                 </tr>
                             </thead>
-                            <tbody id="groupStandingsTableBody" class="divide-y divide-slate-800/60 font-medium">
-                                <!-- Populated dynamically -->
-                            </tbody>
+                            <tbody id="groupStandingsTableBody" class="divide-y divide-slate-800/60 font-medium"></tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- Schedule & Fixtures List -->
                 <div class="lg:col-span-5 glass-panel p-6 rounded-3xl border border-slate-800 space-y-4">
                     <div class="flex items-center justify-between">
                         <h3 class="text-base font-bold text-white flex items-center space-x-2">
                             <i class="fa-solid fa-calendar-days text-cyan-400"></i>
-                            <span>Group Stage Schedule</span>
+                            <span>Official Group Schedule</span>
                         </h3>
                         <span class="text-xs text-slate-400">Host Venues</span>
                     </div>
 
-                    <div id="groupFixturesContainer" class="space-y-3 max-h-[420px] overflow-y-auto pr-1">
-                        <!-- Populated dynamically -->
-                    </div>
+                    <div id="groupFixturesContainer" class="space-y-3 max-h-[420px] overflow-y-auto pr-1"></div>
                 </div>
             </div>
         </section>
 
         <!-- ================= TAB 4: HEAD-TO-HEAD MATCHUP TOOL ================= -->
         <section id="view-h2h" class="hidden space-y-6">
-            <!-- H2H Match Selector Bar -->
             <div class="glass-panel p-6 rounded-3xl border border-slate-800 space-y-6">
                 <div class="text-center max-w-xl mx-auto space-y-1">
                     <h2 class="text-lg sm:text-2xl font-black text-white">Head-to-Head Custom Matchup Engine</h2>
                     <p class="text-xs text-slate-400">Select any two World Cup 2026 national teams for an instant simulation</p>
                 </div>
 
-                <!-- Teams Matchup Card Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-                    <!-- Team A Picker -->
                     <div class="md:col-span-5 glass-card p-4 rounded-2xl space-y-3 text-center border border-slate-800">
                         <span class="text-[10px] uppercase font-bold text-cyan-400 tracking-wider">TEAM A (HOME / RED)</span>
                         <div class="flex items-center justify-center space-x-3">
@@ -506,7 +454,6 @@
                         </div>
                     </div>
 
-                    <!-- VS Divider -->
                     <div class="md:col-span-2 flex flex-col items-center justify-center space-y-2">
                         <div class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-black text-xs text-amber-400 shadow-inner">
                             VS
@@ -516,7 +463,6 @@
                         </button>
                     </div>
 
-                    <!-- Team B Picker -->
                     <div class="md:col-span-5 glass-card p-4 rounded-2xl space-y-3 text-center border border-slate-800">
                         <span class="text-[10px] uppercase font-bold text-purple-400 tracking-wider">TEAM B (AWAY / BLUE)</span>
                         <div class="flex items-center justify-center space-x-3">
@@ -532,9 +478,7 @@
                 </div>
             </div>
 
-            <!-- H2H Analytical Visual Results -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <!-- Donut Probability Chart -->
                 <div class="lg:col-span-5 glass-panel p-6 rounded-3xl border border-slate-800 space-y-4">
                     <h3 class="text-sm font-bold text-white flex items-center justify-between">
                         <span>Win / Draw Probability</span>
@@ -546,20 +490,19 @@
                     <div class="grid grid-cols-3 gap-2 text-center text-xs">
                         <div class="bg-cyan-950/40 border border-cyan-800/50 p-2 rounded-xl">
                             <span class="block text-slate-400 text-[10px]">Team A Win</span>
-                            <span id="h2hWinAPct" class="font-bold text-cyan-400 text-sm">42.5%</span>
+                            <span id="h2hWinAPct" class="font-bold text-cyan-400 text-sm">0.0%</span>
                         </div>
                         <div class="bg-amber-950/40 border border-amber-800/50 p-2 rounded-xl">
                             <span class="block text-slate-400 text-[10px]">Draw</span>
-                            <span id="h2hDrawPct" class="font-bold text-amber-400 text-sm">26.0%</span>
+                            <span id="h2hDrawPct" class="font-bold text-amber-400 text-sm">0.0%</span>
                         </div>
                         <div class="bg-purple-950/40 border border-purple-800/50 p-2 rounded-xl">
                             <span class="block text-slate-400 text-[10px]">Team B Win</span>
-                            <span id="h2hWinBPct" class="font-bold text-purple-400 text-sm">31.5%</span>
+                            <span id="h2hWinBPct" class="font-bold text-purple-400 text-sm">0.0%</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Radar Comparison & Stats Breakdown -->
                 <div class="lg:col-span-7 glass-panel p-6 rounded-3xl border border-slate-800 space-y-4">
                     <div class="flex items-center justify-between">
                         <h3 class="text-sm font-bold text-white">Tactical Comparison Radar</h3>
@@ -575,7 +518,156 @@
             </div>
         </section>
 
+        <!-- ================= TAB 5: USAGE & ADMIN ANALYTICS DASHBOARD ================= -->
+        <section id="view-analytics" class="hidden space-y-6">
+            <div class="glass-panel p-6 rounded-3xl border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <div class="flex items-center space-x-2">
+                        <span class="px-2.5 py-0.5 rounded-full bg-amber-950 text-amber-400 border border-amber-800/60 text-xs font-bold flex items-center space-x-1">
+                            <i class="fa-solid fa-user-shield text-[10px]"></i>
+                            <span>AUTHENTICATED ADMIN SESSION</span>
+                        </span>
+                        <span class="text-xs text-slate-400">Muhammad Ahmed Subhani</span>
+                    </div>
+                    <h2 class="text-xl font-bold text-white">Real-Time Platform Usage & User Behavior Analytics</h2>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                    <button onclick="exportAnalyticsJSON()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold border border-slate-700 flex items-center space-x-2 transition">
+                        <i class="fa-solid fa-download text-cyan-400"></i>
+                        <span>Export Telemetry (JSON)</span>
+                    </button>
+                    <button onclick="resetAnalyticsData()" class="px-3 py-2 bg-red-950/60 hover:bg-red-900/80 text-red-300 rounded-xl text-xs font-semibold border border-red-800/60 flex items-center space-x-1.5 transition">
+                        <i class="fa-solid fa-trash-can"></i>
+                        <span>Reset Metrics</span>
+                    </button>
+                    <button onclick="lockAdminAccess()" class="px-3 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 shadow-md shadow-amber-500/20">
+                        <i class="fa-solid fa-lock"></i>
+                        <span>Lock Dashboard</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Analytics KPI Grid (Strictly zero baseline) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-2">
+                    <div class="flex items-center justify-between text-slate-400">
+                        <span class="text-xs font-bold uppercase tracking-wider">Total Page Views</span>
+                        <i class="fa-solid fa-eye text-cyan-400 text-base"></i>
+                    </div>
+                    <div id="kpiTotalViews" class="text-2xl font-black text-white">0</div>
+                    <div id="dbStatusBadge" class="text-[11px] text-emerald-400 flex items-center space-x-1">
+                        <i class="fa-solid fa-circle text-[8px] animate-pulse"></i>
+                        <span>Local Real-time Active</span>
+                    </div>
+                </div>
+
+                <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-2">
+                    <div class="flex items-center justify-between text-slate-400">
+                        <span class="text-xs font-bold uppercase tracking-wider">Simulations Executed</span>
+                        <i class="fa-solid fa-microchip text-emerald-400 text-base"></i>
+                    </div>
+                    <div id="kpiTotalSims" class="text-2xl font-black text-white">0</div>
+                    <div class="text-[11px] text-slate-400">Actual Monte Carlo iterations</div>
+                </div>
+
+                <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-2">
+                    <div class="flex items-center justify-between text-slate-400">
+                        <span class="text-xs font-bold uppercase tracking-wider">Most Popular Team</span>
+                        <i class="fa-solid fa-trophy text-amber-400 text-base"></i>
+                    </div>
+                    <div id="kpiTopTeam" class="text-2xl font-black text-amber-400">None</div>
+                    <div id="kpiTopTeamViews" class="text-[11px] text-slate-400">0 selections</div>
+                </div>
+
+                <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-2">
+                    <div class="flex items-center justify-between text-slate-400">
+                        <span class="text-xs font-bold uppercase tracking-wider">Active Session Time</span>
+                        <i class="fa-solid fa-stopwatch text-purple-400 text-base"></i>
+                    </div>
+                    <div id="kpiSessionDuration" class="text-2xl font-black text-purple-400">00:00:00</div>
+                    <div class="text-[11px] text-slate-400">Current session timer</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-7 glass-panel p-6 rounded-3xl border border-slate-800 space-y-4">
+                    <h3 class="text-sm font-bold text-white flex items-center justify-between">
+                        <span>Real-Time Hourly Session Activity</span>
+                        <span class="text-xs text-slate-400">Recorded Live</span>
+                    </h3>
+                    <div class="relative w-full h-64">
+                        <canvas id="chartAnalyticsTraffic"></canvas>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-5 glass-panel p-6 rounded-3xl border border-slate-800 space-y-4">
+                    <h3 class="text-sm font-bold text-white">Top Analyzed Teams (Actual Views)</h3>
+                    <div class="relative w-full h-64">
+                        <canvas id="chartAnalyticsTeams"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-6 glass-panel p-6 rounded-3xl border border-slate-800 space-y-4">
+                    <h3 class="text-sm font-bold text-white">Feature & Tab Adoption Rates</h3>
+                    <div id="tabEngagementBars" class="space-y-3 text-xs"></div>
+                </div>
+
+                <div class="lg:col-span-6 glass-panel p-6 rounded-3xl border border-slate-800 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+                            <i class="fa-solid fa-list-check text-cyan-400"></i>
+                            <span>Live Action Event Stream</span>
+                        </h3>
+                        <span class="text-[10px] bg-cyan-950 text-cyan-400 border border-cyan-800 px-2 py-0.5 rounded-full font-bold">LIVE</span>
+                    </div>
+
+                    <div id="adminActivityStream" class="space-y-2 max-h-56 overflow-y-auto text-xs pr-1"></div>
+                </div>
+            </div>
+        </section>
+
     </main>
+
+    <!-- ADMIN AUTHENTICATION MODAL -->
+    <div id="adminAuthModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-800 max-w-md w-full space-y-6 shadow-2xl relative">
+            <div class="text-center space-y-2">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-600 flex items-center justify-center mx-auto text-slate-950 text-xl font-bold shadow-lg shadow-amber-500/20">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h3 class="text-xl font-black text-white">Restricted Admin Access</h3>
+                <p class="text-xs text-slate-400">Please enter your authorized administrator credentials to view Usage & Insights.</p>
+            </div>
+
+            <form onsubmit="authenticateAdmin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Username</label>
+                    <input type="text" id="adminUsernameInput" placeholder="Enter username" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-amber-500" required>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Passcode</label>
+                    <input type="password" id="adminPasscodeInput" placeholder="Enter passcode" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-amber-500" required>
+                </div>
+
+                <div id="adminAuthError" class="hidden text-xs text-red-400 bg-red-950/60 border border-red-800/80 p-2.5 rounded-xl text-center font-medium">
+                    <i class="fa-solid fa-triangle-exclamation mr-1"></i> Invalid username or passcode.
+                </div>
+
+                <div class="flex items-center space-x-3 pt-2">
+                    <button type="button" onclick="closeAdminAuthModal()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="flex-1 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl text-xs uppercase tracking-wider transition shadow-lg shadow-amber-500/20">
+                        Authenticate
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="border-t border-slate-800/80 bg-slate-900/40 py-6 mt-12">
@@ -592,7 +684,35 @@
     </div>
 
     <script>
-        // Official FIFA Ratings & Database of World Cup 2026 teams
+        // =========================================================================
+        // OPTIONAL REAL-TIME DATABASE CONFIGURATION (FIREBASE REALTIME DB)
+        // If you paste your credentials below, metrics automatically sync globally.
+        // If left as null/empty, metrics seamlessly track live zero-based local storage.
+        // =========================================================================
+        const FIREBASE_CONFIG = {
+            apiKey: "AIzaSyDGeDduQT_w5z21Oq17HMhxxzMvh6rzNpg",
+            authDomain: "football-prediction-anal-1988c.firebaseapp.com",
+            databaseURL: "https://football-prediction-anal-1988c-default-rtdb.firebaseio.com",
+            projectId: "football-prediction-anal-1988c",
+            storageBucket: "football-prediction-anal-1988c.firebasestorage.app",
+            messagingSenderId: "432633632868",
+            appId: "1:432633632868:web:7d0b725b23bc1c2108e771",
+            measurementId: "G-NZF2ENW5BP"
+        };
+
+        let dbRef = null;
+        let isFirebaseActive = false;
+
+        if (FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.databaseURL) {
+            try {
+                firebase.initializeApp(FIREBASE_CONFIG);
+                dbRef = firebase.database().ref('wc26_telemetry');
+                isFirebaseActive = true;
+            } catch(e) {
+                console.warn("Firebase initialization skipped, using local tracking.", e);
+            }
+        }
+
         const TEAMS_DATABASE = [
             { name: "Argentina", rating: 1850, code: "ar", group: "J" },
             { name: "France", rating: 1840, code: "fr", group: "I" },
@@ -644,49 +764,296 @@
             { name: "Panama", rating: 1200, code: "pa", group: "K" }
         ];
 
-        // World Cup Venues list
-        const HOST_VENUES = [
-            "Azteca Stadium, Mexico City",
-            "MetLife Stadium, East Rutherford",
-            "SoFi Stadium, Los Angeles",
-            "AT&T Stadium, Arlington",
-            "Arrowhead Stadium, Kansas City",
-            "BC Place, Vancouver",
-            "BMO Field, Toronto",
-            "Hard Rock Stadium, Miami",
-            "Mercedes-Benz Stadium, Atlanta",
-            "NRG Stadium, Houston",
-            "Lincoln Financial Field, Philadelphia",
-            "Levi's Stadium, Santa Clara",
-            "Lumen Field, Seattle"
+        // Real schedule mappings from world-cup-2026-team-schedules.csv
+        const SCHEDULE_FIXTURES = [
+            { matchId: 19, group: "J", team1: "Algeria", team2: "Argentina", venue: "Kansas City Stadium", date: "2026-06-17T01:00:00Z" },
+            { matchId: 44, group: "J", team1: "Algeria", team2: "Jordan", venue: "San Francisco Bay Area Stadium", date: "2026-06-23T03:00:00Z" },
+            { matchId: 69, group: "J", team1: "Algeria", team2: "Austria", venue: "Kansas City Stadium", date: "2026-06-28T02:00:00Z" },
+            { matchId: 43, group: "J", team1: "Argentina", team2: "Austria", venue: "Dallas Stadium", date: "2026-06-22T17:00:00Z" },
+            { matchId: 70, group: "J", team1: "Argentina", team2: "Jordan", venue: "Dallas Stadium", date: "2026-06-28T02:00:00Z" },
+            { matchId: 6, group: "D", team1: "Australia", team2: "Türkiye", venue: "BC Place Vancouver", date: "2026-06-14T04:00:00Z" },
+            { matchId: 32, group: "D", team1: "Australia", team2: "United States", venue: "Seattle Stadium", date: "2026-06-19T19:00:00Z" },
+            { matchId: 60, group: "D", team1: "Australia", team2: "Paraguay", venue: "San Francisco Bay Area Stadium", date: "2026-06-26T02:00:00Z" },
+            { matchId: 20, group: "J", team1: "Austria", team2: "Jordan", venue: "San Francisco Bay Area Stadium", date: "2026-06-17T04:00:00Z" }
         ];
 
-        // Global Application State
         let state = {
             currentTeamName: "Argentina",
             currentOpponentName: "France",
-            pitchMode: "heatmap", // 'heatmap', 'passes', 'shots'
+            pitchMode: "heatmap",
             tactic: "balanced",
             simRuns: 10000,
             telemetry: { passes: [], shots: [] },
-            canvasHoverShot: null,
             h2hTeamA: "Argentina",
-            h2hTeamB: "France"
+            h2hTeamB: "France",
+            sessionStartTime: Date.now()
         };
 
-        // Chart instances storage
         let charts = {
             mcBar: null,
             mcGoalHist: null,
             h2hDonut: null,
-            h2hRadar: null
+            h2hRadar: null,
+            analyticsTraffic: null,
+            analyticsTeams: null
         };
 
-        // Fast Poisson Random Variable Generator (Knuth method)
+        // ZERO BASELINE STORE INITIALIZATION
+        function getAnalyticsStore() {
+            const defaults = {
+                pageViews: 0,
+                simRunsCount: 0,
+                teamClicks: {},
+                tabEngagement: { pitch: 0, simulator: 0, groups: 0, h2h: 0, analytics: 0 },
+                activityLog: []
+            };
+
+            const saved = localStorage.getItem('wc26_analytics_metrics');
+            if (saved) {
+                try { return JSON.parse(saved); } catch(e) {}
+            }
+            return defaults;
+        }
+
+        function saveAnalyticsStore(data) {
+            localStorage.setItem('wc26_analytics_metrics', JSON.stringify(data));
+            if (isFirebaseActive && dbRef) {
+                dbRef.set(data);
+            }
+        }
+
+        function trackPageView() {
+            const data = getAnalyticsStore();
+            data.pageViews++;
+            logUserActivity("Page session initialized");
+            saveAnalyticsStore(data);
+        }
+
+        function trackTeamSelection(teamName) {
+            const data = getAnalyticsStore();
+            data.teamClicks[teamName] = (data.teamClicks[teamName] || 0) + 1;
+            saveAnalyticsStore(data);
+        }
+
+        function trackTabClick(tabId) {
+            const data = getAnalyticsStore();
+            if (data.tabEngagement[tabId] !== undefined) {
+                data.tabEngagement[tabId]++;
+            }
+            saveAnalyticsStore(data);
+        }
+
+        function trackSimulationRun(count = 10000) {
+            const data = getAnalyticsStore();
+            data.simRunsCount += count;
+            logUserActivity(`Executed ${count.toLocaleString()} Monte Carlo simulations`);
+            saveAnalyticsStore(data);
+        }
+
+        function logUserActivity(actionText) {
+            const data = getAnalyticsStore();
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            data.activityLog.unshift({ time: timeStr, text: actionText });
+            if (data.activityLog.length > 25) data.activityLog.pop();
+            saveAnalyticsStore(data);
+        }
+
+        function checkAdminAccess() {
+            if (sessionStorage.getItem('wc26_admin_auth') === 'true') {
+                return true;
+            }
+            document.getElementById('adminAuthModal').classList.remove('hidden');
+            return false;
+        }
+
+        function authenticateAdmin(event) {
+            event.preventDefault();
+            const user = document.getElementById('adminUsernameInput').value.trim().toLowerCase();
+            const pass = document.getElementById('adminPasscodeInput').value.trim();
+
+            if ((user === 'muhammad ahmed subhani' || user === 'muhammad ahmad subhani') && pass === '12345') {
+                sessionStorage.setItem('wc26_admin_auth', 'true');
+                document.getElementById('adminAuthModal').classList.add('hidden');
+                document.getElementById('adminAuthError').classList.add('hidden');
+                document.getElementById('adminUsernameInput').value = '';
+                document.getElementById('adminPasscodeInput').value = '';
+                showToast('Admin access granted!');
+                
+                ['pitch', 'simulator', 'groups', 'h2h', 'analytics'].forEach(t => {
+                    const view = document.getElementById(`view-${t}`);
+                    const btn = document.getElementById(`tab-${t}`);
+                    if (t === 'analytics') {
+                        view.classList.remove('hidden');
+                        btn.classList.add('active');
+                    } else {
+                        view.classList.add('hidden');
+                        btn.classList.remove('active');
+                    }
+                });
+                renderAnalyticsTab();
+            } else {
+                document.getElementById('adminAuthError').classList.remove('hidden');
+            }
+        }
+
+        function closeAdminAuthModal() {
+            document.getElementById('adminAuthModal').classList.add('hidden');
+            document.getElementById('adminAuthError').classList.add('hidden');
+        }
+
+        function lockAdminAccess() {
+            sessionStorage.removeItem('wc26_admin_auth');
+            showToast('Admin Dashboard locked.');
+            switchTab('pitch');
+        }
+
+        function renderAnalyticsTab() {
+            const data = getAnalyticsStore();
+
+            document.getElementById('kpiTotalViews').innerText = data.pageViews.toLocaleString();
+            document.getElementById('kpiTotalSims').innerText = data.simRunsCount.toLocaleString();
+
+            const sortedTeams = Object.entries(data.teamClicks).sort((a,b) => b[1] - a[1]);
+            if (sortedTeams.length > 0) {
+                const top = sortedTeams[0];
+                document.getElementById('kpiTopTeam').innerText = top[0];
+                const totalClicks = Object.values(data.teamClicks).reduce((a,b)=>a+b, 0) || 1;
+                document.getElementById('kpiTopTeamViews').innerText = `${top[1]} selections (${((top[1]/totalClicks)*100).toFixed(1)}%)`;
+            } else {
+                document.getElementById('kpiTopTeam').innerText = "None";
+                document.getElementById('kpiTopTeamViews').innerText = "0 selections";
+            }
+
+            const totalTabClicks = Object.values(data.tabEngagement).reduce((a,b)=>a+b, 0) || 1;
+            const engagementContainer = document.getElementById('tabEngagementBars');
+            engagementContainer.innerHTML = '';
+
+            const tabNames = { pitch: "Tactical Pitch Visualizer", simulator: "Monte Carlo Match Engine", groups: "Group Stage & Schedules", h2h: "Head-to-Head Comparison", analytics: "Admin Analytics" };
+            Object.entries(data.tabEngagement).forEach(([key, val]) => {
+                const pct = ((val / totalTabClicks) * 100).toFixed(1);
+                const item = document.createElement('div');
+                item.className = "space-y-1";
+                item.innerHTML = `
+                    <div class="flex justify-between font-semibold">
+                        <span class="text-slate-300">${tabNames[key] || key}</span>
+                        <span class="text-cyan-400">${pct}% (${val} views)</span>
+                    </div>
+                    <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                        <div class="bg-gradient-to-r from-cyan-500 to-blue-500 h-full" style="width: ${pct}%"></div>
+                    </div>
+                `;
+                engagementContainer.appendChild(item);
+            });
+
+            const streamContainer = document.getElementById('adminActivityStream');
+            streamContainer.innerHTML = '';
+            if (data.activityLog.length === 0) {
+                streamContainer.innerHTML = `<div class="text-slate-500 text-center py-4">No events logged yet. Perform actions to see live activity.</div>`;
+            } else {
+                data.activityLog.forEach(log => {
+                    const div = document.createElement('div');
+                    div.className = "bg-slate-900/80 px-3 py-2 rounded-xl border border-slate-800/80 flex items-center justify-between";
+                    div.innerHTML = `
+                        <span class="text-slate-300 font-medium">${log.text}</span>
+                        <span class="text-[10px] text-slate-500 whitespace-nowrap ml-2">${log.time}</span>
+                    `;
+                    streamContainer.appendChild(div);
+                });
+            }
+
+            const ctxT = document.getElementById('chartAnalyticsTraffic').getContext('2d');
+            if (charts.analyticsTraffic) charts.analyticsTraffic.destroy();
+
+            charts.analyticsTraffic = new Chart(ctxT, {
+                type: 'line',
+                data: {
+                    labels: ['Start', 'Current Session'],
+                    datasets: [{
+                        label: 'Real-Time Sessions',
+                        data: [0, data.pageViews],
+                        borderColor: '#facc15',
+                        backgroundColor: 'rgba(250, 204, 21, 0.12)',
+                        fill: true,
+                        tension: 0.2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            const ctxTeams = document.getElementById('chartAnalyticsTeams').getContext('2d');
+            if (charts.analyticsTeams) charts.analyticsTeams.destroy();
+
+            const top5 = sortedTeams.slice(0, 5);
+            charts.analyticsTeams = new Chart(ctxTeams, {
+                type: 'bar',
+                data: {
+                    labels: top5.length > 0 ? top5.map(t => t[0]) : ['No Data'],
+                    datasets: [{
+                        label: 'User Views',
+                        data: top5.length > 0 ? top5.map(t => t[1]) : [0],
+                        backgroundColor: '#38bdf8',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true },
+                        y: { ticks: { color: '#cbd5e1' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function updateSessionTimer() {
+            const elapsed = Math.floor((Date.now() - state.sessionStartTime) / 1000);
+            const hrs = String(Math.floor(elapsed / 3600)).padStart(2, '0');
+            const mins = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
+            const secs = String(elapsed % 60).padStart(2, '0');
+            const el = document.getElementById('kpiSessionDuration');
+            if (el) el.innerText = `${hrs}:${mins}:${secs}`;
+        }
+        setInterval(updateSessionTimer, 1000);
+
+        function exportAnalyticsJSON() {
+            const data = getAnalyticsStore();
+            const jsonStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `wc26_realtime_analytics_${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast("Exported live analytics JSON!");
+        }
+
+        function resetAnalyticsData() {
+            if (confirm("Are you sure you want to reset all tracked real-time metrics to 0?")) {
+                localStorage.removeItem('wc26_analytics_metrics');
+                if (isFirebaseActive && dbRef) {
+                    dbRef.remove();
+                }
+                showToast("All metrics reset to 0!");
+                renderAnalyticsTab();
+            }
+        }
+
         function poissonRandom(lambda) {
             const L = Math.exp(-lambda);
-            let k = 0;
-            let p = 1.0;
+            let k = 0, p = 1.0;
             do {
                 k++;
                 p *= Math.random();
@@ -694,21 +1061,17 @@
             return k - 1;
         }
 
-        // Helper to retrieve team object by name
         function getTeam(name) {
             return TEAMS_DATABASE.find(t => t.name.toLowerCase() === name.toLowerCase()) || {
                 name: name, rating: 1400, code: "un", group: "A"
             };
         }
 
-        // Expected Goals Math: xG = exp(-0.14 * distance_in_yards)
         function calculateXG(x, y) {
-            // Goal position at (120, 40)
             const dist = Math.sqrt(Math.pow(120 - x, 2) + Math.pow(40 - y, 2));
             return Math.exp(-0.14 * dist);
         }
 
-        // Core Poisson Monte Carlo Simulator for a match between Team 1 and Team 2
         function simulateMatchMonteCarlo(team1Name, team2Name, isHome = false, numSims = 10000) {
             const t1 = getTeam(team1Name);
             const t2 = getTeam(team2Name);
@@ -744,7 +1107,6 @@
                 scoreCounts[key] = (scoreCounts[key] || 0) + 1;
             }
 
-            // Top scorelines sort
             const sortedScorelines = Object.entries(scoreCounts)
                 .map(([score, count]) => ({ score, count, pct: ((count / numSims) * 100).toFixed(1) }))
                 .sort((a, b) => b.count - a.count);
@@ -763,17 +1125,15 @@
             };
         }
 
-        // Dynamic Telemetry Generator based on relative ratings and tactical setup
         function generatePitchTelemetry(teamName, opponentName, tactic = 'balanced') {
             const team = getTeam(teamName);
             const opp = getTeam(opponentName);
             const diff = team.rating - opp.rating;
 
-            // Seeded random pseudo generator
             const passCount = Math.floor(Math.max(250, 480 + diff * 0.22));
             const passes = [];
 
-            let biasX = 0, biasY = 0;
+            let biasX = 0;
             if (tactic === 'highpress') biasX = 15;
             if (tactic === 'tikitaka') biasX = 5;
             if (tactic === 'counter') biasX = -15;
@@ -791,13 +1151,12 @@
                 passes.push({ x: px, y: py, endX, endY });
             }
 
-            // Shot map telemetry
             const shotCount = Math.floor(Math.max(4, 10 + diff / 50));
             const shots = [];
 
             for (let i = 0; i < shotCount; i++) {
-                let sx = 92 + Math.random() * 26; // inside attacking 30 yards
-                let sy = 20 + Math.random() * 40; // central channel
+                let sx = 92 + Math.random() * 26;
+                let sy = 20 + Math.random() * 40;
                 let xg = calculateXG(sx, sy);
                 let isGoal = Math.random() < xg * 1.3;
 
@@ -813,13 +1172,11 @@
             return { passes, shots };
         }
 
-        // Canvas Pitch Renderer
         function renderPitchCanvas() {
             const canvas = document.getElementById('pitchCanvas');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
 
-            // Responsive sizing
             const rect = canvas.getBoundingClientRect();
             canvas.width = rect.width * (window.devicePixelRatio || 1);
             canvas.height = rect.height * (window.devicePixelRatio || 1);
@@ -828,58 +1185,46 @@
             const w = rect.width;
             const h = rect.height;
 
-            // Pitch coordinate mapping (120 x 80 space)
             const scaleX = x => (x / 120) * w;
             const scaleY = y => (y / 80) * h;
 
-            // 1. Draw Pitch Grass & Markings
             ctx.fillStyle = '#0f172a';
             ctx.fillRect(0, 0, w, h);
 
-            // Subtle pitch stripes
             const stripeWidth = w / 12;
             ctx.fillStyle = '#111c35';
             for (let i = 0; i < 12; i += 2) {
                 ctx.fillRect(i * stripeWidth, 0, stripeWidth, h);
             }
 
-            // Pitch Lines Styling
             ctx.strokeStyle = '#334155';
             ctx.lineWidth = 2;
 
-            // Outer boundary
             ctx.strokeRect(scaleX(2), scaleY(2), scaleX(116), scaleY(76));
 
-            // Halfway Line
             ctx.beginPath();
             ctx.moveTo(scaleX(60), scaleY(2));
             ctx.lineTo(scaleX(60), scaleY(78));
             ctx.stroke();
 
-            // Center Circle
             ctx.beginPath();
             ctx.arc(scaleX(60), scaleY(40), scaleX(9.15), 0, 2 * Math.PI);
             ctx.stroke();
 
-            // Center Spot
             ctx.fillStyle = '#334155';
             ctx.beginPath();
             ctx.arc(scaleX(60), scaleY(40), 3, 0, 2 * Math.PI);
             ctx.fill();
 
-            // Penalty Areas (Left & Right)
             ctx.strokeRect(scaleX(2), scaleY(18), scaleX(18), scaleY(44));
             ctx.strokeRect(scaleX(100), scaleY(18), scaleX(18), scaleY(44));
 
-            // 6-Yard Boxes
             ctx.strokeRect(scaleX(2), scaleY(30), scaleX(6), scaleY(20));
             ctx.strokeRect(scaleX(112), scaleY(30), scaleX(6), scaleY(20));
 
-            // Goals
             ctx.strokeRect(scaleX(0.5), scaleY(34), scaleX(1.5), scaleY(12));
             ctx.strokeRect(scaleX(118), scaleY(34), scaleX(1.5), scaleY(12));
 
-            // 2. Render Pitch Telemetry Layer based on active mode
             if (state.pitchMode === 'heatmap') {
                 renderHeatmapOverlay(ctx, w, h, scaleX, scaleY);
             } else if (state.pitchMode === 'passes') {
@@ -906,7 +1251,6 @@
                 ctx.fill();
             });
 
-            // Update Legend
             document.getElementById('pitchLegend').innerHTML = `
                 <div class="flex items-center space-x-2">
                     <span class="w-3 h-3 rounded-full bg-cyan-400"></span>
@@ -916,7 +1260,7 @@
         }
 
         function renderPassVectorsOverlay(ctx, scaleX, scaleY) {
-            const passes = state.telemetry.passes.slice(0, 65); // Draw sample vector subset for clarity
+            const passes = state.telemetry.passes.slice(0, 65);
             passes.forEach(p => {
                 const isForward = p.endX > p.x + 3;
                 ctx.strokeStyle = isForward ? 'rgba(56, 189, 248, 0.75)' : 'rgba(148, 163, 184, 0.4)';
@@ -927,15 +1271,12 @@
                 ctx.lineTo(scaleX(p.endX), scaleY(p.endY));
                 ctx.stroke();
 
-                // Arrow head
-                const angle = Math.atan2(scaleY(p.endY - p.y), scaleX(p.endX - p.x));
                 ctx.fillStyle = ctx.strokeStyle;
                 ctx.beginPath();
                 ctx.arc(scaleX(p.endX), scaleY(p.endY), 2.5, 0, 2 * Math.PI);
                 ctx.fill();
             });
 
-            // Update Legend
             document.getElementById('pitchLegend').innerHTML = `
                 <div class="flex items-center space-x-3">
                     <span class="flex items-center"><span class="w-3 h-0.5 bg-cyan-400 mr-1"></span> Progressive Pass</span>
@@ -950,7 +1291,6 @@
                 const radius = Math.max(6, s.xg * 22);
 
                 if (s.isGoal) {
-                    // Goal Star / Yellow Glow
                     ctx.fillStyle = '#facc15';
                     ctx.shadowColor = '#facc15';
                     ctx.shadowBlur = 12;
@@ -959,12 +1299,11 @@
                     ctx.arc(scaleX(s.x), scaleY(s.y), radius + 2, 0, 2 * Math.PI);
                     ctx.fill();
 
-                    ctx.shadowBlur = 0; // reset
+                    ctx.shadowBlur = 0;
                     ctx.strokeStyle = '#000';
                     ctx.lineWidth = 1.5;
                     ctx.stroke();
                 } else {
-                    // Saved/Missed Ring
                     ctx.strokeStyle = '#f87171';
                     ctx.lineWidth = 2;
                     ctx.fillStyle = 'rgba(248, 113, 113, 0.2)';
@@ -976,7 +1315,6 @@
                 }
             });
 
-            // Update Legend
             document.getElementById('pitchLegend').innerHTML = `
                 <div class="flex items-center space-x-3">
                     <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-amber-400 mr-1"></span> Goal (Size = xG)</span>
@@ -985,7 +1323,6 @@
             `;
         }
 
-        // Refresh Pitch Data and UI text
         function regeneratePitchData() {
             const teamSelect = document.getElementById('primaryTeamSelect');
             if (teamSelect) state.currentTeamName = teamSelect.value;
@@ -998,7 +1335,6 @@
 
             state.telemetry = generatePitchTelemetry(state.currentTeamName, state.currentOpponentName, state.tactic);
 
-            // Update UI elements
             document.getElementById('pitchCanvasTitle').innerText = `${state.currentTeamName} - Tactical Pitch Telemetry vs ${state.currentOpponentName}`;
             
             document.getElementById('statPassCount').innerText = state.telemetry.passes.length;
@@ -1008,13 +1344,11 @@
             const totalXg = state.telemetry.shots.reduce((acc, s) => acc + s.xg, 0).toFixed(2);
             document.getElementById('statShotsXg').innerText = `${state.telemetry.shots.length} (${totalXg} xG)`;
 
-            // Insights text
             document.getElementById('insightDominance').innerText = `${state.currentTeamName} controls ${(52 + (getTeam(state.currentTeamName).rating - getTeam(state.currentOpponentName).rating) / 20).toFixed(0)}% of progression vector corridors in the final third.`;
             
             renderPitchCanvas();
         }
 
-        // Set pitch mode tab
         function setPitchMode(mode) {
             state.pitchMode = mode;
             ['heatmap', 'passes', 'shots'].forEach(m => {
@@ -1028,27 +1362,26 @@
             renderPitchCanvas();
         }
 
-        // Run Monte Carlo Simulation & Update Tab 2 Visuals
         function runMonteCarloGroupSimulations() {
             const team = getTeam(state.currentTeamName);
+            trackSimulationRun(state.simRuns);
             
-            // Get group opponents
             const groupTeams = TEAMS_DATABASE.filter(t => t.group === team.group && t.name !== team.name);
             const opponents = groupTeams.length >= 3 ? groupTeams.slice(0, 3) : TEAMS_DATABASE.filter(t => t.name !== team.name).slice(0, 3);
 
             const simResults = opponents.map(opp => simulateMatchMonteCarlo(team.name, opp.name, false, state.simRuns));
 
-            // 1. Render Group Match Probability Cards
             const cardsContainer = document.getElementById('simMatchCardsGrid');
             cardsContainer.innerHTML = '';
 
             simResults.forEach((res, idx) => {
+                const matchInfo = SCHEDULE_FIXTURES.find(f => (f.team1 === res.team1.name && f.team2 === res.team2.name) || (f.team2 === res.team1.name && f.team1 === res.team2.name)) || { venue: HOST_VENUES[idx % HOST_VENUES.length] };
                 const card = document.createElement('div');
                 card.className = "glass-card p-4 rounded-2xl border border-slate-800 space-y-3";
                 card.innerHTML = `
                     <div class="flex items-center justify-between text-xs text-slate-400">
                         <span>Match ${idx + 1} • Group Stage</span>
-                        <span class="text-cyan-400 font-semibold">${HOST_VENUES[idx % HOST_VENUES.length]}</span>
+                        <span class="text-cyan-400 font-semibold">${matchInfo.venue}</span>
                     </div>
                     
                     <div class="flex items-center justify-between font-bold text-sm">
@@ -1063,7 +1396,6 @@
                         </div>
                     </div>
 
-                    <!-- Probability Progress Bar -->
                     <div class="space-y-1">
                         <div class="h-2.5 w-full bg-slate-800 rounded-full overflow-hidden flex">
                             <div style="width: ${res.win1Pct}%" class="bg-emerald-400" title="Win: ${res.win1Pct}%"></div>
@@ -1085,7 +1417,6 @@
                 cardsContainer.appendChild(card);
             });
 
-            // 2. Render Scoreline Matrix for Match 1
             const scoreMatrixList = document.getElementById('scorelineMatrixList');
             scoreMatrixList.innerHTML = '';
             simResults[0].topScorelines.forEach(item => {
@@ -1103,10 +1434,7 @@
                 scoreMatrixList.appendChild(row);
             });
 
-            // 3. Update Chart.js Probability Bar Chart
             updateMonteCarloBarChart(simResults);
-
-            // 4. Update Goal Distribution Histogram
             updateGoalHistogramChart(simResults[0]);
         }
 
@@ -1175,9 +1503,7 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { labels: { color: '#94a3b8' } }
-                    },
+                    plugins: { legend: { labels: { color: '#94a3b8' } } },
                     scales: {
                         x: { ticks: { color: '#cbd5e1' }, grid: { color: 'rgba(255,255,255,0.05)' } },
                         y: { ticks: { color: '#cbd5e1' }, grid: { color: 'rgba(255,255,255,0.05)' } }
@@ -1192,16 +1518,13 @@
 
             document.getElementById('groupTableTitle').innerHTML = `<span>Group ${selectedGroup} Standings Projections</span>`;
 
-            // Get group teams
             const groupTeams = TEAMS_DATABASE.filter(t => t.group === selectedGroup);
 
-            // Calculate group match simulation standings
             const standingsMap = {};
             groupTeams.forEach(t => {
                 standingsMap[t.name] = { team: t, mp: 3, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 };
             });
 
-            // Simulate group fixtures
             for (let i = 0; i < groupTeams.length; i++) {
                 for (let j = i + 1; j < groupTeams.length; j++) {
                     const res = simulateMatchMonteCarlo(groupTeams[i].name, groupTeams[j].name, false, 2000);
@@ -1220,7 +1543,6 @@
                 }
             }
 
-            // Sort standings by PTS -> GD -> GF
             const sortedStandings = Object.values(standingsMap).sort((a, b) => {
                 if (b.pts !== a.pts) return b.pts - a.pts;
                 const gdB = b.gf - b.ga;
@@ -1229,7 +1551,6 @@
                 return b.gf - a.gf;
             });
 
-            // Render Table Body
             const tableBody = document.getElementById('groupStandingsTableBody');
             tableBody.innerHTML = '';
 
@@ -1256,18 +1577,18 @@
                 tableBody.appendChild(tr);
             });
 
-            // Render Fixtures
             const fixturesContainer = document.getElementById('groupFixturesContainer');
             fixturesContainer.innerHTML = '';
 
             for (let i = 0; i < groupTeams.length; i++) {
                 for (let j = i + 1; j < groupTeams.length; j++) {
+                    const matchInfo = SCHEDULE_FIXTURES.find(f => (f.team1 === groupTeams[i].name && f.team2 === groupTeams[j].name) || (f.team2 === groupTeams[i].name && f.team1 === groupTeams[j].name)) || { venue: "Host Venue", date: "June 2026" };
                     const fCard = document.createElement('div');
                     fCard.className = "bg-slate-900/80 p-3 rounded-2xl border border-slate-800 space-y-2 text-xs";
                     fCard.innerHTML = `
                         <div class="flex items-center justify-between text-[11px] text-slate-400">
-                            <span>June 2026 • Matchday ${i + 1}</span>
-                            <span class="text-cyan-400">${HOST_VENUES[(i + j) % HOST_VENUES.length]}</span>
+                            <span>June 2026 • Group Stage</span>
+                            <span class="text-cyan-400">${matchInfo.venue}</span>
                         </div>
                         <div class="flex items-center justify-between font-bold">
                             <div class="flex items-center space-x-2">
@@ -1286,13 +1607,12 @@
             }
         }
 
-        // Simulate Entire Tournament Button Trigger
         function simulateAllTournamentGroups() {
+            logUserActivity("Simulated all 72 Group Stage matches across 12 groups");
             showToast("Simulated all 72 Group Stage matches across 12 groups!");
             renderGroupStageView();
         }
 
-        // Head to Head Matchup Engine
         function updateH2HMatchup() {
             state.h2hTeamA = document.getElementById('h2hTeamASelect').value;
             state.h2hTeamB = document.getElementById('h2hTeamBSelect').value;
@@ -1310,13 +1630,13 @@
         }
 
         function runH2HSimulation() {
+            trackSimulationRun(10000);
             const res = simulateMatchMonteCarlo(state.h2hTeamA, state.h2hTeamB, false, 10000);
 
             document.getElementById('h2hWinAPct').innerText = `${res.win1Pct}%`;
             document.getElementById('h2hDrawPct').innerText = `${res.drawPct}%`;
             document.getElementById('h2hWinBPct').innerText = `${res.win2Pct}%`;
 
-            // Donut Chart Update
             const ctxD = document.getElementById('chartH2HDonut').getContext('2d');
             if (charts.h2hDonut) charts.h2hDonut.destroy();
 
@@ -1333,14 +1653,11 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
+                    plugins: { legend: { display: false } },
                     cutout: '72%'
                 }
             });
 
-            // Radar Chart Update
             const ctxR = document.getElementById('chartH2HRadar').getContext('2d');
             if (charts.h2hRadar) charts.h2hRadar.destroy();
 
@@ -1377,16 +1694,19 @@
                             ticks: { display: false }
                         }
                     },
-                    plugins: {
-                        legend: { labels: { color: '#cbd5e1' } }
-                    }
+                    plugins: { legend: { labels: { color: '#cbd5e1' } } }
                 }
             });
         }
 
-        // Tab switching controller
         function switchTab(tabId) {
-            ['pitch', 'simulator', 'groups', 'h2h'].forEach(t => {
+            if (tabId === 'analytics') {
+                if (!checkAdminAccess()) return;
+            }
+
+            trackTabClick(tabId);
+
+            ['pitch', 'simulator', 'groups', 'h2h', 'analytics'].forEach(t => {
                 const view = document.getElementById(`view-${t}`);
                 const btn = document.getElementById(`tab-${t}`);
                 if (t === tabId) {
@@ -1406,16 +1726,16 @@
                 renderGroupStageView();
             } else if (tabId === 'h2h') {
                 updateH2HMatchup();
+            } else if (tabId === 'analytics') {
+                renderAnalyticsTab();
             }
         }
 
-        // Slider label updater
         function updateSimCountLabel(val) {
             state.simRuns = parseInt(val);
             document.getElementById('simCountLabel').innerText = `${parseInt(val).toLocaleString()} Runs`;
         }
 
-        // Toast message popup
         function showToast(msg) {
             const toast = document.getElementById('toastNotification');
             document.getElementById('toastMessage').innerText = msg;
@@ -1425,7 +1745,6 @@
             }, 2500);
         }
 
-        // Copy H2H summary report
         function copyH2HReport() {
             const text = `FIFA World Cup 2026 Match Report: ${state.h2hTeamA} vs ${state.h2hTeamB}\n` +
                 `Win Probabilities: ${state.h2hTeamA} (${document.getElementById('h2hWinAPct').innerText}) | ` +
@@ -1443,9 +1762,9 @@
             showToast("Match report copied to clipboard!");
         }
 
-        // App Initializer
         window.onload = function () {
-            // Populate primary team select
+            trackPageView();
+
             const primarySelect = document.getElementById('primaryTeamSelect');
             const pitchOppSelect = document.getElementById('pitchOpponentSelect');
             const h2hASelect = document.getElementById('h2hTeamASelect');
@@ -1468,12 +1787,13 @@
             h2hASelect.value = "Argentina";
             h2hBSelect.value = "France";
 
-            // Event Listeners
             primarySelect.addEventListener('change', (e) => {
                 const team = getTeam(e.target.value);
                 state.currentTeamName = team.name;
 
-                // Update primary badge & flag
+                trackTeamSelection(team.name);
+                logUserActivity(`Selected team: ${team.name}`);
+
                 document.getElementById('selectedTeamFlag').src = `https://flagcdn.com/w40/${team.code}.png`;
                 document.getElementById('selectedTeamFlag').classList.remove('hidden');
                 document.getElementById('selectedTeamFallbackIcon').classList.add('hidden');
@@ -1483,10 +1803,7 @@
                 regeneratePitchData();
             });
 
-            // Trigger initial selection setup
             primarySelect.dispatchEvent(new Event('change'));
-
-            // Canvas window resize listener
             window.addEventListener('resize', renderPitchCanvas);
         };
     </script>
