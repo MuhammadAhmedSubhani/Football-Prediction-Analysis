@@ -15,11 +15,10 @@
                     colors: {
                         pitch: '#0f172a',
                         pitchLine: '#334155',
-                        brandCyan: '#38bdf8',
-                        brandEmerald: '#4ade80',
-                        brandAmber: '#facc15',
-                        brandRed: '#f87171',
-                        brandPurple: '#a855f7'
+                        accentBlue: '#38bdf8',
+                        accentGreen: '#34d399',
+                        accentAmber: '#fbbf24',
+                        accentRed: '#f87171'
                     },
                     fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
@@ -36,40 +35,44 @@
     <!-- Google Fonts Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Firebase Realtime Database SDKs (Compat version for lightweight integration) -->
+    <!-- Firebase Realtime Database SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #090d16;
+            background-color: #0b0f17;
             color: #f1f5f9;
         }
 
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        /* Clean scrollbar styling */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
-        .glass-panel {
-            background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+        /* Mobile touch scrolling for tab navigation */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .dashboard-card {
+            background-color: #111827;
+            border: 1px solid #1f2937;
+            border-radius: 0.875rem;
         }
 
-        .glass-card {
-            background: rgba(30, 41, 59, 0.6);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+        .tab-btn {
+            color: #94a3b8;
+            border-bottom: 2px solid transparent;
         }
 
         .tab-btn.active {
             color: #38bdf8;
             border-bottom-color: #38bdf8;
-            background: rgba(56, 189, 248, 0.08);
+            background-color: rgba(56, 189, 248, 0.05);
         }
 
         #pitchTooltip {
@@ -81,336 +84,271 @@
 <body class="min-h-screen flex flex-col antialiased bg-slate-950 text-slate-100">
 
     <!-- Top Navigation Header -->
-    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
+    <header class="sticky top-0 z-40 bg-slate-900 border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between py-3 gap-3">
+                
                 <!-- Brand Title -->
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-                        <i class="fa-solid font-bold text-white text-lg fa-futbol"></i>
-                    </div>
-                    <div>
-                        <div class="flex items-center space-x-2">
-                            <h1 class="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-indigo-300">
-                                WORLD CUP 2026
-                            </h1>
-                            <span class="text-xs px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800/60 font-semibold">
-                                ANALYTICS HUB
-                            </span>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-9 h-9 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-sky-400 font-bold">
+                            <i class="fa-solid fa-futbol text-base"></i>
                         </div>
-                        <p class="text-xs text-slate-400 hidden sm:block">Tactical Telemetry & Monte Carlo Match Simulator</p>
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <h1 class="text-base sm:text-lg font-bold text-white tracking-tight">WORLD CUP 2026</h1>
+                                <span class="text-[10px] px-2 py-0.5 rounded bg-sky-950 text-sky-400 border border-sky-800 font-medium">ANALYTICS</span>
+                            </div>
+                            <p class="text-[11px] text-slate-400">Tactical Telemetry & Simulation Engine</p>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Global Team Selector Dropdown -->
-                <div class="flex items-center space-x-3">
-                    <div class="relative w-48 sm:w-64">
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                <img id="selectedTeamFlag" src="https://flagcdn.com/w40/ar.png" class="w-5 h-3.5 object-cover rounded-sm mr-1 hidden" alt="flag">
-                                <i id="selectedTeamFallbackIcon" class="fa-solid fa-flag text-xs"></i>
-                            </span>
-                            <select id="primaryTeamSelect" class="w-full pl-9 pr-8 py-2 bg-slate-800/90 text-sm font-medium border border-slate-700/80 rounded-xl text-white focus:ring-2 focus:ring-cyan-500 focus:outline-none appearance-none cursor-pointer hover:border-slate-600 transition">
-                                <!-- Options populated dynamically -->
-                            </select>
-                            <span class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                                <i class="fa-solid fa-chevron-down text-xs"></i>
-                            </span>
-                        </div>
+                <div class="flex items-center space-x-2 w-full sm:w-auto">
+                    <div class="relative flex-1 sm:w-60">
+                        <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400">
+                            <img id="selectedTeamFlag" src="https://flagcdn.com/w40/ar.png" class="w-4 h-3 object-cover rounded-sm hidden" alt="flag">
+                            <i id="selectedTeamFallbackIcon" class="fa-solid fa-flag text-xs"></i>
+                        </span>
+                        <select id="primaryTeamSelect" class="w-full pl-8 pr-7 py-2 bg-slate-800 text-xs font-semibold border border-slate-700 rounded-lg text-white focus:outline-none focus:border-sky-500 appearance-none cursor-pointer truncate">
+                            <!-- Populated dynamically -->
+                        </select>
+                        <span class="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-slate-400">
+                            <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                        </span>
                     </div>
 
                     <!-- Team Quick Info Badge -->
-                    <div id="primaryTeamBadge" class="hidden md:flex items-center space-x-2 bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700/60 text-xs">
-                        <span class="text-slate-400">Rating:</span>
+                    <div id="primaryTeamBadge" class="flex items-center space-x-1.5 bg-slate-800 px-2.5 py-2 rounded-lg border border-slate-700 text-xs flex-shrink-0">
+                        <span class="text-slate-400 text-[11px]">Elo:</span>
                         <span id="primaryTeamRatingVal" class="font-bold text-emerald-400">1850</span>
-                        <span class="text-slate-500">|</span>
-                        <span id="primaryTeamGroupVal" class="font-medium text-cyan-400">Group J</span>
                     </div>
                 </div>
             </div>
 
             <!-- Main Module Navigation Tabs -->
-            <nav class="flex space-x-1 sm:space-x-4 border-t border-slate-800/80 overflow-x-auto no-scrollbar">
-                <button onclick="switchTab('pitch')" id="tab-pitch" class="tab-btn active px-4 py-3 text-xs sm:text-sm font-medium text-slate-300 border-b-2 border-transparent hover:text-cyan-400 flex items-center space-x-2 whitespace-nowrap transition">
+            <nav class="flex space-x-1 border-t border-slate-800/80 overflow-x-auto no-scrollbar pt-1 -mb-px">
+                <button onclick="switchTab('pitch')" id="tab-pitch" class="tab-btn active px-3 py-2.5 text-xs font-semibold hover:text-sky-400 flex items-center space-x-2 whitespace-nowrap transition">
                     <i class="fa-solid fa-crosshairs"></i>
-                    <span>Tactical Pitch & Visualizer</span>
+                    <span>Tactical Pitch</span>
                 </button>
-                <button onclick="switchTab('simulator')" id="tab-simulator" class="tab-btn px-4 py-3 text-xs sm:text-sm font-medium text-slate-400 border-b-2 border-transparent hover:text-cyan-400 flex items-center space-x-2 whitespace-nowrap transition">
+                <button onclick="switchTab('simulator')" id="tab-simulator" class="tab-btn px-3 py-2.5 text-xs font-semibold hover:text-sky-400 flex items-center space-x-2 whitespace-nowrap transition">
                     <i class="fa-solid fa-dice-d20"></i>
-                    <span>10k Monte Carlo Simulator</span>
+                    <span>10k Simulator</span>
                 </button>
-                <button onclick="switchTab('groups')" id="tab-groups" class="tab-btn px-4 py-3 text-xs sm:text-sm font-medium text-slate-400 border-b-2 border-transparent hover:text-cyan-400 flex items-center space-x-2 whitespace-nowrap transition">
+                <button onclick="switchTab('groups')" id="tab-groups" class="tab-btn px-3 py-2.5 text-xs font-semibold hover:text-sky-400 flex items-center space-x-2 whitespace-nowrap transition">
                     <i class="fa-solid fa-table-cells"></i>
-                    <span>Group Stage & Schedules</span>
+                    <span>Group Schedules</span>
                 </button>
-                <button onclick="switchTab('h2h')" id="tab-h2h" class="tab-btn px-4 py-3 text-xs sm:text-sm font-medium text-slate-400 border-b-2 border-transparent hover:text-cyan-400 flex items-center space-x-2 whitespace-nowrap transition">
+                <button onclick="switchTab('h2h')" id="tab-h2h" class="tab-btn px-3 py-2.5 text-xs font-semibold hover:text-sky-400 flex items-center space-x-2 whitespace-nowrap transition">
                     <i class="fa-solid fa-code-compare"></i>
-                    <span>Head-to-Head Matchup Tool</span>
+                    <span>Head-to-Head</span>
                 </button>
-                <button onclick="switchTab('analytics')" id="tab-analytics" class="tab-btn px-4 py-3 text-xs sm:text-sm font-medium text-slate-400 border-b-2 border-transparent hover:text-amber-400 flex items-center space-x-2 whitespace-nowrap transition border-l border-slate-800/60 ml-auto">
+                <button onclick="switchTab('analytics')" id="tab-analytics" class="tab-btn px-3 py-2.5 text-xs font-semibold hover:text-amber-400 flex items-center space-x-1.5 whitespace-nowrap transition ml-auto">
                     <i class="fa-solid fa-chart-pie text-amber-400"></i>
-                    <span>Usage & Admin Insights</span>
-                    <i class="fa-solid fa-lock text-[10px] text-amber-400 ml-1"></i>
+                    <span>Admin Insights</span>
+                    <i class="fa-solid fa-lock text-[9px] text-amber-400"></i>
                 </button>
             </nav>
         </div>
     </header>
 
     <!-- Main Content Area -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 space-y-5">
 
         <!-- ================= TAB 1: TACTICAL PITCH VISUALIZER ================= -->
-        <section id="view-pitch" class="space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-                <div class="md:col-span-6 bg-slate-900/80 p-1.5 rounded-2xl border border-slate-800 flex items-center space-x-1">
-                    <button onclick="setPitchMode('heatmap')" id="mode-heatmap" class="flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center space-x-1.5 bg-cyan-500 text-slate-950 shadow-md">
+        <section id="view-pitch" class="space-y-4">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div class="bg-slate-900 p-1 rounded-xl border border-slate-800 flex items-center space-x-1 w-full md:w-auto">
+                    <button onclick="setPitchMode('heatmap')" id="mode-heatmap" class="flex-1 md:flex-none py-1.5 px-3 rounded-lg text-xs font-semibold transition flex items-center justify-center space-x-1.5 bg-sky-500 text-slate-950">
                         <i class="fa-solid fa-fire"></i>
-                        <span>Positional Heatmap</span>
+                        <span>Heatmap</span>
                     </button>
-                    <button onclick="setPitchMode('passes')" id="mode-passes" class="flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center space-x-1.5 text-slate-400 hover:text-white hover:bg-slate-800">
+                    <button onclick="setPitchMode('passes')" id="mode-passes" class="flex-1 md:flex-none py-1.5 px-3 rounded-lg text-xs font-semibold transition flex items-center justify-center space-x-1.5 text-slate-400 hover:text-white hover:bg-slate-800">
                         <i class="fa-solid fa-arrows-split-up-and-left"></i>
                         <span>Pass Vectors</span>
                     </button>
-                    <button onclick="setPitchMode('shots')" id="mode-shots" class="flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center space-x-1.5 text-slate-400 hover:text-white hover:bg-slate-800">
+                    <button onclick="setPitchMode('shots')" id="mode-shots" class="flex-1 md:flex-none py-1.5 px-3 rounded-lg text-xs font-semibold transition flex items-center justify-center space-x-1.5 text-slate-400 hover:text-white hover:bg-slate-800">
                         <i class="fa-solid fa-bullseye"></i>
-                        <span>Shot Map & xG</span>
+                        <span>Shots & xG</span>
                     </button>
                 </div>
 
-                <div class="md:col-span-6 grid grid-cols-2 gap-3">
-                    <div class="relative">
-                        <label class="text-[10px] uppercase tracking-wider font-semibold text-slate-400 block mb-1">Opponent</label>
-                        <select id="pitchOpponentSelect" onchange="regeneratePitchData()" class="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:ring-1 focus:ring-cyan-500">
+                <div class="grid grid-cols-2 gap-2 w-full md:w-80">
+                    <div>
+                        <label class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Opponent</label>
+                        <select id="pitchOpponentSelect" onchange="regeneratePitchData()" class="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-sky-500 truncate">
                             <!-- Populated dynamically -->
                         </select>
                     </div>
 
-                    <div class="relative">
-                        <label class="text-[10px] uppercase tracking-wider font-semibold text-slate-400 block mb-1">Tactical Setup</label>
-                        <select id="pitchTacticSelect" onchange="regeneratePitchData()" class="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:ring-1 focus:ring-cyan-500">
-                            <option value="balanced">Balanced Possession (4-3-3)</option>
-                            <option value="highpress">High Press Attack (4-2-3-1)</option>
-                            <option value="tikitaka">Tiki-Taka Control (4-1-4-1)</option>
-                            <option value="counter">Low Block Counter (5-3-2)</option>
+                    <div>
+                        <label class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Tactics</label>
+                        <select id="pitchTacticSelect" onchange="regeneratePitchData()" class="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-sky-500 truncate">
+                            <option value="balanced">4-3-3 Balanced</option>
+                            <option value="highpress">4-2-3-1 High Press</option>
+                            <option value="tikitaka">4-1-4-1 Tiki-Taka</option>
+                            <option value="counter">5-3-2 Low Block</option>
                         </select>
                     </div>
                 </div>
             </div>
 
-            <div class="glass-panel rounded-3xl p-4 sm:p-6 relative overflow-hidden border border-slate-800">
-                <div class="flex flex-col lg:flex-row items-center justify-between mb-4 gap-4">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-3 h-3 rounded-full bg-cyan-400 animate-ping"></div>
-                        <h2 id="pitchCanvasTitle" class="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
-                            <span>Argentina - Tactical Pitch Telemetry</span>
-                        </h2>
-                    </div>
+            <div class="dashboard-card p-4 sm:p-5 relative overflow-hidden">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 gap-2">
+                    <h2 id="pitchCanvasTitle" class="text-sm sm:text-base font-bold text-white flex items-center space-x-2">
+                        <span>Argentina - Tactical Pitch Telemetry</span>
+                    </h2>
 
-                    <div class="flex flex-wrap items-center gap-3 text-xs">
-                        <div class="bg-slate-800/90 px-3 py-1.5 rounded-xl border border-slate-700/60">
-                            <span class="text-slate-400">Total Passes:</span>
-                            <span id="statPassCount" class="font-bold text-cyan-400 ml-1">0</span>
+                    <div class="flex flex-wrap items-center gap-2 text-xs">
+                        <div class="bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">
+                            <span class="text-slate-400">Passes:</span>
+                            <span id="statPassCount" class="font-bold text-sky-400 ml-1">0</span>
                         </div>
-                        <div class="bg-slate-800/90 px-3 py-1.5 rounded-xl border border-slate-700/60">
-                            <span class="text-slate-400">Pass Acc:</span>
+                        <div class="bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">
+                            <span class="text-slate-400">Accuracy:</span>
                             <span id="statPassAcc" class="font-bold text-emerald-400 ml-1">0.0%</span>
                         </div>
-                        <div class="bg-slate-800/90 px-3 py-1.5 rounded-xl border border-slate-700/60">
-                            <span class="text-slate-400">Shots (xG):</span>
-                            <span id="statShotsXg" class="font-bold text-amber-400 ml-1">0 (0.00 xG)</span>
+                        <div class="bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">
+                            <span class="text-slate-400">xG:</span>
+                            <span id="statShotsXg" class="font-bold text-amber-400 ml-1">0.00</span>
                         </div>
-                        <button onclick="regeneratePitchData()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center space-x-1.5 transition">
-                            <i class="fa-solid fa-arrows-rotate"></i>
+                        <button onclick="regeneratePitchData()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center space-x-1 transition">
+                            <i class="fa-solid fa-arrows-rotate text-[10px]"></i>
                             <span>Resample</span>
                         </button>
                     </div>
                 </div>
 
-                <div class="relative w-full aspect-[12/8] max-h-[580px] bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 flex items-center justify-center shadow-2xl">
-                    <canvas id="pitchCanvas" class="w-full h-full cursor-crosshair block"></canvas>
-
-                    <div id="pitchTooltip" class="absolute hidden opacity-0 bg-slate-900/95 text-white text-xs px-3 py-2 rounded-xl border border-cyan-500/40 shadow-xl backdrop-blur-md z-30"></div>
-
-                    <div id="pitchLegend" class="absolute bottom-3 right-3 bg-slate-900/90 border border-slate-800 backdrop-blur-md px-3 py-2 rounded-xl text-[11px] text-slate-300 flex items-center space-x-4 pointer-events-none"></div>
+                <div class="relative w-full aspect-[4/3] sm:aspect-[16/9] max-h-[480px] bg-slate-950 rounded-xl overflow-hidden border border-slate-800 flex items-center justify-center">
+                    <canvas id="pitchCanvas" class="w-full h-full block cursor-crosshair"></canvas>
+                    <div id="pitchTooltip" class="absolute hidden opacity-0 bg-slate-900 text-white text-xs px-2.5 py-1.5 rounded-lg border border-slate-700 shadow-lg z-30 pointer-events-none"></div>
+                    <div id="pitchLegend" class="absolute bottom-2 right-2 bg-slate-900/90 border border-slate-800 px-2.5 py-1.5 rounded-lg text-[10px] text-slate-300 pointer-events-none"></div>
                 </div>
 
-                <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div class="glass-card p-4 rounded-2xl">
-                        <div class="flex items-center space-x-2 text-cyan-400 mb-1">
-                            <i class="fa-solid fa-chart-line text-sm"></i>
-                            <span class="text-xs font-bold uppercase tracking-wider">Field Dominance</span>
-                        </div>
-                        <p id="insightDominance" class="text-xs text-slate-300 leading-relaxed">
-                            Awaiting real-time telemetry generation...
-                        </p>
+                <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800/80">
+                        <span class="text-[10px] uppercase font-bold text-sky-400 block mb-1">Field Dominance</span>
+                        <p id="insightDominance" class="text-xs text-slate-300 leading-snug">Calculating spatial control vectors...</p>
                     </div>
-                    <div class="glass-card p-4 rounded-2xl">
-                        <div class="flex items-center space-x-2 text-emerald-400 mb-1">
-                            <i class="fa-solid fa-bullseye text-sm"></i>
-                            <span class="text-xs font-bold uppercase tracking-wider">Shot Creation Index</span>
-                        </div>
-                        <p id="insightShots" class="text-xs text-slate-300 leading-relaxed">
-                            Awaiting real-time telemetry generation...
-                        </p>
+                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800/80">
+                        <span class="text-[10px] uppercase font-bold text-emerald-400 block mb-1">Shot Creation</span>
+                        <p id="insightShots" class="text-xs text-slate-300 leading-snug">Calculating expected goal creation...</p>
                     </div>
-                    <div class="glass-card p-4 rounded-2xl">
-                        <div class="flex items-center space-x-2 text-amber-400 mb-1">
-                            <i class="fa-solid fa-shield-halved text-sm"></i>
-                            <span class="text-xs font-bold uppercase tracking-wider">Counter Vulnerability</span>
-                        </div>
-                        <p id="insightVulnerability" class="text-xs text-slate-300 leading-relaxed">
-                            Awaiting real-time telemetry generation...
-                        </p>
+                    <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800/80">
+                        <span class="text-[10px] uppercase font-bold text-amber-400 block mb-1">Counter Exposure</span>
+                        <p id="insightVulnerability" class="text-xs text-slate-300 leading-snug">Evaluating defensive shape transition...</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- ================= TAB 2: MONTE CARLO SIMULATOR ENGINE ================= -->
-        <section id="view-simulator" class="hidden space-y-6">
-            <div class="glass-panel p-6 rounded-3xl border border-slate-800 relative overflow-hidden">
-                <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+        <section id="view-simulator" class="hidden space-y-4">
+            <div class="dashboard-card p-4 sm:p-5 border border-slate-800">
+                <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
                     <div class="space-y-1">
                         <div class="flex items-center space-x-2">
-                            <span class="px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800/60 text-xs font-bold">
-                                POISSON ENGINE ACTIVE
+                            <span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] font-bold">
+                                POISSON ENGINE
                             </span>
-                            <span class="text-xs text-slate-400">Monte Carlo Match Simulator</span>
+                            <span class="text-xs text-slate-400">Match Simulator</span>
                         </div>
-                        <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">
-                            World Cup Group Match Simulation Engine
+                        <h2 class="text-base sm:text-xl font-bold text-white tracking-tight">
+                            World Cup Group Stage Monte Carlo
                         </h2>
-                        <p class="text-xs sm:text-sm text-slate-400 max-w-2xl">
-                            Simulates thousands of full match fixtures using FIFA ratings, home-field advantage factors, and Poisson goal-scoring expectation algorithms.
+                        <p class="text-xs text-slate-400 max-w-xl">
+                            Simulates match fixtures using Elo ratings and Poisson goal-scoring probability distributions.
                         </p>
                     </div>
 
-                    <div class="w-full lg:w-auto bg-slate-900/90 p-4 rounded-2xl border border-slate-800 space-y-3 flex-shrink-0">
-                        <div class="flex items-center justify-between space-x-4">
-                            <label class="text-xs font-semibold text-slate-300">Simulation Iterations:</label>
-                            <span id="simCountLabel" class="text-xs font-bold text-cyan-400 bg-cyan-950/80 px-2.5 py-1 rounded-lg border border-cyan-800/60">
-                                10,000 Runs
-                            </span>
+                    <div class="w-full lg:w-auto bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-2 flex-shrink-0">
+                        <div class="flex items-center justify-between space-x-3 text-xs">
+                            <span class="font-semibold text-slate-300">Iterations:</span>
+                            <span id="simCountLabel" class="font-bold text-sky-400 font-mono">10,000 Runs</span>
                         </div>
-                        <input type="range" id="simSlider" min="1000" max="10000" step="1000" value="10000" oninput="updateSimCountLabel(this.value)" class="w-full accent-cyan-400 cursor-pointer">
-                        
-                        <button onclick="runMonteCarloGroupSimulations()" class="w-full py-2.5 px-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-cyan-500/20 flex items-center justify-center space-x-2 transition">
-                            <i class="fa-solid fa-play"></i>
-                            <span>Execute 10k Monte Carlo</span>
+                        <input type="range" id="simSlider" min="1000" max="10000" step="1000" value="10000" oninput="updateSimCountLabel(this.value)" class="w-full accent-sky-400 cursor-pointer">
+                        <button onclick="runMonteCarloGroupSimulations()" class="w-full py-2 px-3 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold rounded-lg text-xs uppercase tracking-wider transition flex items-center justify-center space-x-1.5 shadow-sm">
+                            <i class="fa-solid fa-play text-[10px]"></i>
+                            <span>Execute Simulation</span>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div id="simMatchCardsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+            <div id="simMatchCardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <div class="lg:col-span-7 glass-panel p-6 rounded-3xl border border-slate-800">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-sm sm:text-base font-bold text-white flex items-center space-x-2">
-                            <i class="fa-solid fa-chart-column text-cyan-400"></i>
-                            <span>Match Outcome Probabilities (%)</span>
-                        </h3>
-                        <span class="text-xs text-slate-400">Group Fixtures</span>
-                    </div>
-                    <div class="relative w-full h-64 sm:h-80">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                <div class="lg:col-span-7 dashboard-card p-4 sm:p-5">
+                    <h3 class="text-xs font-bold text-slate-300 mb-3 flex items-center justify-between">
+                        <span>Win / Draw / Loss Probabilities (%)</span>
+                        <span class="text-[10px] text-slate-500">10k Runs</span>
+                    </h3>
+                    <div class="relative w-full h-56 sm:h-64">
                         <canvas id="chartMonteCarloBar"></canvas>
                     </div>
                 </div>
 
-                <div class="lg:col-span-5 glass-panel p-6 rounded-3xl border border-slate-800 flex flex-col justify-between">
+                <div class="lg:col-span-5 dashboard-card p-4 sm:p-5 flex flex-col justify-between">
                     <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-sm sm:text-base font-bold text-white flex items-center space-x-2">
-                                <i class="fa-solid fa-list-ol text-amber-400"></i>
-                                <span>Most Likely Scorelines</span>
-                            </h3>
-                            <span class="text-xs text-slate-400">Primary Match</span>
-                        </div>
-
-                        <div id="scorelineMatrixList" class="space-y-2 text-xs"></div>
+                        <h3 class="text-xs font-bold text-slate-300 mb-3">Most Likely Scorelines</h3>
+                        <div id="scorelineMatrixList" class="space-y-1.5 text-xs"></div>
                     </div>
-
-                    <div class="mt-4 pt-4 border-t border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
-                        <span>Model: Poisson (&lambda;<sub>team</sub> = 1.4 + &Delta;R / 350)</span>
-                        <span class="text-emerald-400 font-semibold"><i class="fa-solid fa-check-circle mr-1"></i> Converged</span>
+                    <div class="mt-3 pt-3 border-t border-slate-800 text-[10px] text-slate-500 flex items-center justify-between">
+                        <span>Model: Poisson Distribution</span>
+                        <span class="text-emerald-400 font-medium"><i class="fa-solid fa-check-circle mr-1"></i> Converged</span>
                     </div>
                 </div>
             </div>
 
-            <div class="glass-panel p-6 rounded-3xl border border-slate-800">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-sm sm:text-base font-bold text-white flex items-center space-x-2">
-                        <i class="fa-solid fa-chart-area text-emerald-400"></i>
-                        <span>Simulated Goals Distribution Spectrum (10,000 Matches)</span>
-                    </h3>
-                </div>
-                <div class="relative w-full h-60">
+            <div class="dashboard-card p-4 sm:p-5">
+                <h3 class="text-xs font-bold text-slate-300 mb-3">Simulated Goals Distribution Spectrum</h3>
+                <div class="relative w-full h-52">
                     <canvas id="chartGoalHistogram"></canvas>
                 </div>
             </div>
         </section>
 
         <!-- ================= TAB 3: GROUP STAGE & SCHEDULES ================= -->
-        <section id="view-groups" class="hidden space-y-6">
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 glass-panel p-4 rounded-2xl border border-slate-800">
-                <div class="flex items-center space-x-3">
-                    <div class="p-2.5 rounded-xl bg-slate-800 text-cyan-400 border border-slate-700">
-                        <i class="fa-solid fa-trophy text-lg"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-base sm:text-lg font-bold text-white">World Cup 2026 Tournament Groups</h2>
-                        <p class="text-xs text-slate-400">12 Groups (A to L) • Top 2 + 8 Best 3rd Place Teams Advance</p>
-                    </div>
+        <section id="view-groups" class="hidden space-y-4">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 dashboard-card p-4">
+                <div>
+                    <h2 class="text-sm sm:text-base font-bold text-white">World Cup 2026 Tournament Groups</h2>
+                    <p class="text-xs text-slate-400">12 Groups (A to L) • Top 2 + 8 Best 3rd Place Teams Advance</p>
                 </div>
 
-                <div class="flex items-center space-x-2 w-full sm:w-auto overflow-x-auto no-scrollbar">
-                    <select id="groupFilterSelect" onchange="renderGroupStageView()" class="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:ring-1 focus:ring-cyan-500 font-medium">
-                        <option value="ALL">Show Selected Group (Auto)</option>
-                        <option value="A">Group A</option>
-                        <option value="B">Group B</option>
-                        <option value="C">Group C</option>
-                        <option value="D">Group D</option>
-                        <option value="E">Group E</option>
-                        <option value="F">Group F</option>
-                        <option value="G">Group G</option>
-                        <option value="H">Group H</option>
-                        <option value="I">Group I</option>
-                        <option value="J">Group J</option>
-                        <option value="K">Group K</option>
-                        <option value="L">Group L</option>
+                <div class="flex items-center space-x-2 w-full sm:w-auto">
+                    <select id="groupFilterSelect" onchange="renderGroupStageView()" class="px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-sky-500 font-medium">
+                        <option value="ALL">Auto (Selected Team)</option>
+                        <option value="A">Group A</option><option value="B">Group B</option>
+                        <option value="C">Group C</option><option value="D">Group D</option>
+                        <option value="E">Group E</option><option value="F">Group F</option>
+                        <option value="G">Group G</option><option value="H">Group H</option>
+                        <option value="I">Group I</option><option value="J">Group J</option>
+                        <option value="K">Group K</option><option value="L">Group L</option>
                     </select>
 
-                    <button onclick="simulateAllTournamentGroups()" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs whitespace-nowrap transition flex items-center space-x-1.5 shadow-md shadow-emerald-500/20">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i>
-                        <span>Simulate Tournament Stage</span>
+                    <button onclick="simulateAllTournamentGroups()" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-lg text-xs whitespace-nowrap transition">
+                        Simulate Group
                     </button>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <div class="lg:col-span-7 glass-panel p-6 rounded-3xl border border-slate-800 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h3 id="groupTableTitle" class="text-base font-bold text-white flex items-center space-x-2">
-                            <span>Group Standings Projections</span>
-                        </h3>
-                        <span class="text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-semibold border border-slate-700">
-                            Simulated Table
-                        </span>
-                    </div>
-
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                <div class="lg:col-span-7 dashboard-card p-4 space-y-3">
+                    <h3 id="groupTableTitle" class="text-xs font-bold text-slate-300">Group Standings Projections</h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs">
-                            <thead class="bg-slate-900/90 text-slate-400 uppercase tracking-wider border-b border-slate-800">
+                            <thead class="bg-slate-900 text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-800">
                                 <tr>
-                                    <th class="py-3 px-3">Team</th>
-                                    <th class="py-3 px-2 text-center">Rating</th>
-                                    <th class="py-3 px-2 text-center">MP</th>
-                                    <th class="py-3 px-2 text-center">W-D-L</th>
-                                    <th class="py-3 px-2 text-center">GF:GA</th>
-                                    <th class="py-3 px-2 text-center">GD</th>
-                                    <th class="py-3 px-2 text-center font-bold text-cyan-400">PTS</th>
-                                    <th class="py-3 px-2 text-center">Adv. %</th>
+                                    <th class="py-2.5 px-2">Team</th>
+                                    <th class="py-2.5 px-2 text-center">Elo</th>
+                                    <th class="py-2.5 px-2 text-center">MP</th>
+                                    <th class="py-2.5 px-2 text-center">W-D-L</th>
+                                    <th class="py-2.5 px-2 text-center">GF:GA</th>
+                                    <th class="py-2.5 px-2 text-center">GD</th>
+                                    <th class="py-2.5 px-2 text-center font-bold text-sky-400">PTS</th>
                                 </tr>
                             </thead>
                             <tbody id="groupStandingsTableBody" class="divide-y divide-slate-800/60 font-medium"></tbody>
@@ -418,100 +356,83 @@
                     </div>
                 </div>
 
-                <div class="lg:col-span-5 glass-panel p-6 rounded-3xl border border-slate-800 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-base font-bold text-white flex items-center space-x-2">
-                            <i class="fa-solid fa-calendar-days text-cyan-400"></i>
-                            <span>Official Group Schedule</span>
-                        </h3>
-                        <span class="text-xs text-slate-400">Host Venues</span>
-                    </div>
-
-                    <div id="groupFixturesContainer" class="space-y-3 max-h-[420px] overflow-y-auto pr-1"></div>
+                <div class="lg:col-span-5 dashboard-card p-4 space-y-3">
+                    <h3 class="text-xs font-bold text-slate-300">Group Schedule & Venues</h3>
+                    <div id="groupFixturesContainer" class="space-y-2 max-h-[380px] overflow-y-auto pr-1"></div>
                 </div>
             </div>
         </section>
 
         <!-- ================= TAB 4: HEAD-TO-HEAD MATCHUP TOOL ================= -->
-        <section id="view-h2h" class="hidden space-y-6">
-            <div class="glass-panel p-6 rounded-3xl border border-slate-800 space-y-6">
-                <div class="text-center max-w-xl mx-auto space-y-1">
-                    <h2 class="text-lg sm:text-2xl font-black text-white">Head-to-Head Custom Matchup Engine</h2>
-                    <p class="text-xs text-slate-400">Select any two World Cup 2026 national teams for an instant simulation</p>
+        <section id="view-h2h" class="hidden space-y-4">
+            <div class="dashboard-card p-4 sm:p-5 space-y-4">
+                <div class="text-center max-w-md mx-auto space-y-1">
+                    <h2 class="text-base sm:text-lg font-bold text-white">Head-to-Head Custom Matchup</h2>
+                    <p class="text-xs text-slate-400">Select two teams to run an instant 10,000 match simulation</p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-                    <div class="md:col-span-5 glass-card p-4 rounded-2xl space-y-3 text-center border border-slate-800">
-                        <span class="text-[10px] uppercase font-bold text-cyan-400 tracking-wider">TEAM A (HOME / RED)</span>
-                        <div class="flex items-center justify-center space-x-3">
-                            <img id="h2hTeamAFlag" src="https://flagcdn.com/w40/ar.png" class="w-8 h-6 object-cover rounded shadow" alt="flag">
-                            <select id="h2hTeamASelect" onchange="updateH2HMatchup()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white font-bold focus:outline-none focus:ring-2 focus:ring-cyan-500">
-                                <!-- Dynamic options -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+                    <div class="md:col-span-5 bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-2 text-center">
+                        <span class="text-[10px] uppercase font-bold text-sky-400">TEAM A</span>
+                        <div class="flex items-center justify-center space-x-2">
+                            <img id="h2hTeamAFlag" src="https://flagcdn.com/w40/ar.png" class="w-6 h-4 object-cover rounded-sm" alt="flag">
+                            <select id="h2hTeamASelect" onchange="updateH2HMatchup()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white font-bold focus:outline-none">
+                                <!-- Options -->
                             </select>
                         </div>
-                        <div class="text-xs text-slate-400">
-                            FIFA Rating: <span id="h2hTeamARating" class="font-bold text-emerald-400">1850</span>
-                        </div>
+                        <div class="text-[11px] text-slate-400">Rating: <span id="h2hTeamARating" class="font-bold text-emerald-400">1850</span></div>
                     </div>
 
-                    <div class="md:col-span-2 flex flex-col items-center justify-center space-y-2">
-                        <div class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-black text-xs text-amber-400 shadow-inner">
-                            VS
-                        </div>
-                        <button onclick="runH2HSimulation()" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl text-xs uppercase tracking-wider transition shadow-lg shadow-amber-500/20">
+                    <div class="md:col-span-2 flex flex-col items-center justify-center">
+                        <button onclick="runH2HSimulation()" class="px-3 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg text-xs uppercase transition shadow-sm w-full md:w-auto">
                             Simulate
                         </button>
                     </div>
 
-                    <div class="md:col-span-5 glass-card p-4 rounded-2xl space-y-3 text-center border border-slate-800">
-                        <span class="text-[10px] uppercase font-bold text-purple-400 tracking-wider">TEAM B (AWAY / BLUE)</span>
-                        <div class="flex items-center justify-center space-x-3">
-                            <img id="h2hTeamBFlag" src="https://flagcdn.com/w40/fr.png" class="w-8 h-6 object-cover rounded shadow" alt="flag">
-                            <select id="h2hTeamBSelect" onchange="updateH2HMatchup()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white font-bold focus:outline-none focus:ring-2 focus:ring-purple-500">
-                                <!-- Dynamic options -->
+                    <div class="md:col-span-5 bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-2 text-center">
+                        <span class="text-[10px] uppercase font-bold text-purple-400">TEAM B</span>
+                        <div class="flex items-center justify-center space-x-2">
+                            <img id="h2hTeamBFlag" src="https://flagcdn.com/w40/fr.png" class="w-6 h-4 object-cover rounded-sm" alt="flag">
+                            <select id="h2hTeamBSelect" onchange="updateH2HMatchup()" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white font-bold focus:outline-none">
+                                <!-- Options -->
                             </select>
                         </div>
-                        <div class="text-xs text-slate-400">
-                            FIFA Rating: <span id="h2hTeamBRating" class="font-bold text-emerald-400">1840</span>
-                        </div>
+                        <div class="text-[11px] text-slate-400">Rating: <span id="h2hTeamBRating" class="font-bold text-emerald-400">1840</span></div>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <div class="lg:col-span-5 glass-panel p-6 rounded-3xl border border-slate-800 space-y-4">
-                    <h3 class="text-sm font-bold text-white flex items-center justify-between">
-                        <span>Win / Draw Probability</span>
-                        <span class="text-xs text-slate-400">10,000 Matches</span>
-                    </h3>
-                    <div class="relative w-full aspect-square max-h-[260px] mx-auto flex items-center justify-center">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                <div class="lg:col-span-5 dashboard-card p-4 space-y-3">
+                    <h3 class="text-xs font-bold text-slate-300">Win / Draw Probabilities</h3>
+                    <div class="relative w-full aspect-square max-h-[220px] mx-auto">
                         <canvas id="chartH2HDonut"></canvas>
                     </div>
                     <div class="grid grid-cols-3 gap-2 text-center text-xs">
-                        <div class="bg-cyan-950/40 border border-cyan-800/50 p-2 rounded-xl">
-                            <span class="block text-slate-400 text-[10px]">Team A Win</span>
-                            <span id="h2hWinAPct" class="font-bold text-cyan-400 text-sm">0.0%</span>
+                        <div class="bg-slate-900 p-2 rounded-lg border border-slate-800">
+                            <span class="block text-slate-400 text-[10px]">Team A</span>
+                            <span id="h2hWinAPct" class="font-bold text-sky-400 text-xs">0.0%</span>
                         </div>
-                        <div class="bg-amber-950/40 border border-amber-800/50 p-2 rounded-xl">
+                        <div class="bg-slate-900 p-2 rounded-lg border border-slate-800">
                             <span class="block text-slate-400 text-[10px]">Draw</span>
-                            <span id="h2hDrawPct" class="font-bold text-amber-400 text-sm">0.0%</span>
+                            <span id="h2hDrawPct" class="font-bold text-amber-400 text-xs">0.0%</span>
                         </div>
-                        <div class="bg-purple-950/40 border border-purple-800/50 p-2 rounded-xl">
-                            <span class="block text-slate-400 text-[10px]">Team B Win</span>
-                            <span id="h2hWinBPct" class="font-bold text-purple-400 text-sm">0.0%</span>
+                        <div class="bg-slate-900 p-2 rounded-lg border border-slate-800">
+                            <span class="block text-slate-400 text-[10px]">Team B</span>
+                            <span id="h2hWinBPct" class="font-bold text-purple-400 text-xs">0.0%</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="lg:col-span-7 glass-panel p-6 rounded-3xl border border-slate-800 space-y-4">
+                <div class="lg:col-span-7 dashboard-card p-4 space-y-3">
                     <div class="flex items-center justify-between">
-                        <h3 class="text-sm font-bold text-white">Tactical Comparison Radar</h3>
-                        <button onclick="copyH2HReport()" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg text-cyan-400 border border-slate-700 flex items-center space-x-1 transition">
-                            <i class="fa-regular fa-copy"></i>
-                            <span>Copy Report</span>
+                        <h3 class="text-xs font-bold text-slate-300">Tactical Comparison Radar</h3>
+                        <button onclick="copyH2HReport()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-xs text-sky-400 border border-slate-700 rounded-lg flex items-center space-x-1">
+                            <i class="fa-regular fa-copy text-[10px]"></i>
+                            <span>Copy</span>
                         </button>
                     </div>
-                    <div class="relative w-full h-64">
+                    <div class="relative w-full h-56">
                         <canvas id="chartH2HRadar"></canvas>
                     </div>
                 </div>
@@ -519,112 +440,82 @@
         </section>
 
         <!-- ================= TAB 5: USAGE & ADMIN ANALYTICS DASHBOARD ================= -->
-        <section id="view-analytics" class="hidden space-y-6">
-            <div class="glass-panel p-6 rounded-3xl border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <div class="space-y-1">
-                    <div class="flex items-center space-x-2">
-                        <span class="px-2.5 py-0.5 rounded-full bg-amber-950 text-amber-400 border border-amber-800/60 text-xs font-bold flex items-center space-x-1">
-                            <i class="fa-solid fa-user-shield text-[10px]"></i>
-                            <span>AUTHENTICATED ADMIN SESSION</span>
-                        </span>
-                        <span class="text-xs text-slate-400">Muhammad Ahmed Subhani</span>
-                    </div>
-                    <h2 class="text-xl font-bold text-white">Real-Time Platform Usage & User Behavior Analytics</h2>
+        <section id="view-analytics" class="hidden space-y-4">
+            <div class="dashboard-card p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+                <div>
+                    <span class="px-2 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800 text-[10px] font-bold">
+                        ADMIN AUTHENTICATED
+                    </span>
+                    <h2 class="text-base font-bold text-white mt-1">Platform Usage & User Behavior Analytics</h2>
                 </div>
 
-                <div class="flex items-center space-x-3">
-                    <button onclick="exportAnalyticsJSON()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold border border-slate-700 flex items-center space-x-2 transition">
-                        <i class="fa-solid fa-download text-cyan-400"></i>
-                        <span>Export Telemetry (JSON)</span>
+                <div class="flex items-center space-x-2">
+                    <button onclick="exportAnalyticsJSON()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs border border-slate-700 flex items-center space-x-1">
+                        <i class="fa-solid fa-download text-sky-400 text-[10px]"></i>
+                        <span>Export JSON</span>
                     </button>
-                    <button onclick="resetAnalyticsData()" class="px-3 py-2 bg-red-950/60 hover:bg-red-900/80 text-red-300 rounded-xl text-xs font-semibold border border-red-800/60 flex items-center space-x-1.5 transition">
-                        <i class="fa-solid fa-trash-can"></i>
-                        <span>Reset Metrics</span>
+                    <button onclick="resetAnalyticsData()" class="px-2.5 py-1.5 bg-red-950/80 hover:bg-red-900 text-red-300 rounded-lg text-xs border border-red-800/80 flex items-center space-x-1">
+                        <i class="fa-solid fa-trash-can text-[10px]"></i>
+                        <span>Reset</span>
                     </button>
-                    <button onclick="lockAdminAccess()" class="px-3 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 shadow-md shadow-amber-500/20">
-                        <i class="fa-solid fa-lock"></i>
-                        <span>Lock Dashboard</span>
+                    <button onclick="lockAdminAccess()" class="px-2.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg text-xs flex items-center space-x-1">
+                        <i class="fa-solid fa-lock text-[10px]"></i>
+                        <span>Lock</span>
                     </button>
                 </div>
             </div>
 
-            <!-- Analytics KPI Grid (Strictly zero baseline) -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-2">
-                    <div class="flex items-center justify-between text-slate-400">
-                        <span class="text-xs font-bold uppercase tracking-wider">Total Page Views</span>
-                        <i class="fa-solid fa-eye text-cyan-400 text-base"></i>
-                    </div>
-                    <div id="kpiTotalViews" class="text-2xl font-black text-white">0</div>
-                    <div id="dbStatusBadge" class="text-[11px] text-emerald-400 flex items-center space-x-1">
-                        <i class="fa-solid fa-circle text-[8px] animate-pulse"></i>
-                        <span>Local Real-time Active</span>
-                    </div>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <div class="dashboard-card p-4 space-y-1">
+                    <span class="text-[10px] uppercase font-bold text-slate-400">Total Views</span>
+                    <div id="kpiTotalViews" class="text-xl font-bold text-white">0</div>
+                    <div class="text-[10px] text-emerald-400"><i class="fa-solid fa-circle text-[6px] mr-1"></i> Live Tracking</div>
                 </div>
 
-                <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-2">
-                    <div class="flex items-center justify-between text-slate-400">
-                        <span class="text-xs font-bold uppercase tracking-wider">Simulations Executed</span>
-                        <i class="fa-solid fa-microchip text-emerald-400 text-base"></i>
-                    </div>
-                    <div id="kpiTotalSims" class="text-2xl font-black text-white">0</div>
-                    <div class="text-[11px] text-slate-400">Actual Monte Carlo iterations</div>
+                <div class="dashboard-card p-4 space-y-1">
+                    <span class="text-[10px] uppercase font-bold text-slate-400">Simulations Executed</span>
+                    <div id="kpiTotalSims" class="text-xl font-bold text-white">0</div>
+                    <div class="text-[10px] text-slate-400">Monte Carlo runs</div>
                 </div>
 
-                <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-2">
-                    <div class="flex items-center justify-between text-slate-400">
-                        <span class="text-xs font-bold uppercase tracking-wider">Most Popular Team</span>
-                        <i class="fa-solid fa-trophy text-amber-400 text-base"></i>
-                    </div>
-                    <div id="kpiTopTeam" class="text-2xl font-black text-amber-400">None</div>
-                    <div id="kpiTopTeamViews" class="text-[11px] text-slate-400">0 selections</div>
+                <div class="dashboard-card p-4 space-y-1">
+                    <span class="text-[10px] uppercase font-bold text-slate-400">Top Selected Team</span>
+                    <div id="kpiTopTeam" class="text-xl font-bold text-amber-400 truncate">None</div>
+                    <div id="kpiTopTeamViews" class="text-[10px] text-slate-400">0 selections</div>
                 </div>
 
-                <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-2">
-                    <div class="flex items-center justify-between text-slate-400">
-                        <span class="text-xs font-bold uppercase tracking-wider">Active Session Time</span>
-                        <i class="fa-solid fa-stopwatch text-purple-400 text-base"></i>
-                    </div>
-                    <div id="kpiSessionDuration" class="text-2xl font-black text-purple-400">00:00:00</div>
-                    <div class="text-[11px] text-slate-400">Current session timer</div>
+                <div class="dashboard-card p-4 space-y-1">
+                    <span class="text-[10px] uppercase font-bold text-slate-400">Session Timer</span>
+                    <div id="kpiSessionDuration" class="text-xl font-bold text-purple-400 font-mono">00:00:00</div>
+                    <div class="text-[10px] text-slate-400">Active session</div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <div class="lg:col-span-7 glass-panel p-6 rounded-3xl border border-slate-800 space-y-4">
-                    <h3 class="text-sm font-bold text-white flex items-center justify-between">
-                        <span>Real-Time Hourly Session Activity</span>
-                        <span class="text-xs text-slate-400">Recorded Live</span>
-                    </h3>
-                    <div class="relative w-full h-64">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                <div class="lg:col-span-7 dashboard-card p-4 space-y-3">
+                    <h3 class="text-xs font-bold text-slate-300">Session Traffic Activity</h3>
+                    <div class="relative w-full h-52">
                         <canvas id="chartAnalyticsTraffic"></canvas>
                     </div>
                 </div>
 
-                <div class="lg:col-span-5 glass-panel p-6 rounded-3xl border border-slate-800 space-y-4">
-                    <h3 class="text-sm font-bold text-white">Top Analyzed Teams (Actual Views)</h3>
-                    <div class="relative w-full h-64">
+                <div class="lg:col-span-5 dashboard-card p-4 space-y-3">
+                    <h3 class="text-xs font-bold text-slate-300">Top Team Views</h3>
+                    <div class="relative w-full h-52">
                         <canvas id="chartAnalyticsTeams"></canvas>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <div class="lg:col-span-6 glass-panel p-6 rounded-3xl border border-slate-800 space-y-4">
-                    <h3 class="text-sm font-bold text-white">Feature & Tab Adoption Rates</h3>
-                    <div id="tabEngagementBars" class="space-y-3 text-xs"></div>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                <div class="lg:col-span-6 dashboard-card p-4 space-y-3">
+                    <h3 class="text-xs font-bold text-slate-300">Feature Adoption</h3>
+                    <div id="tabEngagementBars" class="space-y-2 text-xs"></div>
                 </div>
 
-                <div class="lg:col-span-6 glass-panel p-6 rounded-3xl border border-slate-800 space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-sm font-bold text-white flex items-center space-x-2">
-                            <i class="fa-solid fa-list-check text-cyan-400"></i>
-                            <span>Live Action Event Stream</span>
-                        </h3>
-                        <span class="text-[10px] bg-cyan-950 text-cyan-400 border border-cyan-800 px-2 py-0.5 rounded-full font-bold">LIVE</span>
-                    </div>
-
-                    <div id="adminActivityStream" class="space-y-2 max-h-56 overflow-y-auto text-xs pr-1"></div>
+                <div class="lg:col-span-6 dashboard-card p-4 space-y-3">
+                    <h3 class="text-xs font-bold text-slate-300">Live Action Stream</h3>
+                    <div id="adminActivityStream" class="space-y-1.5 max-h-48 overflow-y-auto text-xs pr-1"></div>
                 </div>
             </div>
         </section>
@@ -632,36 +523,36 @@
     </main>
 
     <!-- ADMIN AUTHENTICATION MODAL -->
-    <div id="adminAuthModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-800 max-w-md w-full space-y-6 shadow-2xl relative">
-            <div class="text-center space-y-2">
-                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-600 flex items-center justify-center mx-auto text-slate-950 text-xl font-bold shadow-lg shadow-amber-500/20">
+    <div id="adminAuthModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="dashboard-card p-5 sm:p-6 max-w-sm w-full space-y-4 relative bg-slate-900">
+            <div class="text-center space-y-1">
+                <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto text-base font-bold">
                     <i class="fa-solid fa-lock"></i>
                 </div>
-                <h3 class="text-xl font-black text-white">Restricted Admin Access</h3>
-                <p class="text-xs text-slate-400">Please enter your authorized administrator credentials to view Usage & Insights.</p>
+                <h3 class="text-base font-bold text-white">Admin Authentication</h3>
+                <p class="text-xs text-slate-400">Enter authorized credentials to view platform usage analytics.</p>
             </div>
 
-            <form onsubmit="authenticateAdmin(event)" class="space-y-4">
+            <form onsubmit="authenticateAdmin(event)" class="space-y-3">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Username</label>
-                    <input type="text" id="adminUsernameInput" placeholder="Enter username" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-amber-500" required>
+                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Username</label>
+                    <input type="text" id="adminUsernameInput" placeholder="Enter username" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-amber-500" required>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Passcode</label>
-                    <input type="password" id="adminPasscodeInput" placeholder="Enter passcode" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-amber-500" required>
+                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Passcode</label>
+                    <input type="password" id="adminPasscodeInput" placeholder="Enter passcode" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-amber-500" required>
                 </div>
 
-                <div id="adminAuthError" class="hidden text-xs text-red-400 bg-red-950/60 border border-red-800/80 p-2.5 rounded-xl text-center font-medium">
-                    <i class="fa-solid fa-triangle-exclamation mr-1"></i> Invalid username or passcode.
+                <div id="adminAuthError" class="hidden text-xs text-red-400 bg-red-950/40 border border-red-900/60 p-2 rounded-lg text-center font-medium">
+                    Invalid username or passcode.
                 </div>
 
-                <div class="flex items-center space-x-3 pt-2">
-                    <button type="button" onclick="closeAdminAuthModal()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition">
+                <div class="flex items-center space-x-2 pt-1">
+                    <button type="button" onclick="closeAdminAuthModal()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-semibold transition">
                         Cancel
                     </button>
-                    <button type="submit" class="flex-1 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl text-xs uppercase tracking-wider transition shadow-lg shadow-amber-500/20">
+                    <button type="submit" class="flex-1 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg text-xs transition">
                         Authenticate
                     </button>
                 </div>
@@ -670,24 +561,23 @@
     </div>
 
     <!-- Footer -->
-    <footer class="border-t border-slate-800/80 bg-slate-900/40 py-6 mt-12">
-        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 space-y-2">
-            <p>FIFA World Cup 2026 Analytics Dashboard • Monte Carlo Simulation Engine</p>
-            <p class="text-[11px] text-slate-600">Calculations based on standard Poisson goal distributions and FIFA World Rankings</p>
+    <footer class="border-t border-slate-800/80 bg-slate-900/30 py-4 mt-8">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 space-y-1">
+            <p>FIFA World Cup 2026 Analytics Dashboard • Monte Carlo Tactical Simulator</p>
+            <p class="text-[10px] text-slate-600">Calculations based on standard Poisson goal distributions and FIFA Elo Rankings</p>
         </div>
     </footer>
 
-    <!-- Global Toast Notification Container -->
-    <div id="toastNotification" class="fixed bottom-5 right-5 transform translate-y-10 opacity-0 pointer-events-none transition-all duration-300 z-50 bg-slate-900 text-white px-4 py-3 rounded-2xl border border-cyan-500/40 shadow-2xl flex items-center space-x-3 text-xs">
-        <i id="toastIcon" class="fa-solid fa-circle-check text-cyan-400 text-base"></i>
+    <!-- Global Toast Notification -->
+    <div id="toastNotification" class="fixed bottom-4 right-4 transform translate-y-10 opacity-0 pointer-events-none transition-all duration-300 z-50 bg-slate-900 text-white px-3.5 py-2.5 rounded-xl border border-slate-700 shadow-xl flex items-center space-x-2 text-xs">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-sky-400"></i>
         <span id="toastMessage">Report copied to clipboard!</span>
     </div>
 
     <script>
         // =========================================================================
-        // OPTIONAL REAL-TIME DATABASE CONFIGURATION (FIREBASE REALTIME DB)
-        // If you paste your credentials below, metrics automatically sync globally.
-        // If left as null/empty, metrics seamlessly track live zero-based local storage.
+        // REAL-TIME DATABASE CONFIGURATION (FIREBASE REALTIME DB)
+        // Credentials pre-configured from project source file
         // =========================================================================
         const FIREBASE_CONFIG = {
             apiKey: "AIzaSyDGeDduQT_w5z21Oq17HMhxxzMvh6rzNpg",
@@ -712,6 +602,22 @@
                 console.warn("Firebase initialization skipped, using local tracking.", e);
             }
         }
+
+        const HOST_VENUES = [
+            "Azteca Stadium, Mexico City",
+            "MetLife Stadium, East Rutherford",
+            "SoFi Stadium, Los Angeles",
+            "AT&T Stadium, Arlington",
+            "Arrowhead Stadium, Kansas City",
+            "BC Place, Vancouver",
+            "BMO Field, Toronto",
+            "Hard Rock Stadium, Miami",
+            "Mercedes-Benz Stadium, Atlanta",
+            "NRG Stadium, Houston",
+            "Lincoln Financial Field, Philadelphia",
+            "Levi's Stadium, Santa Clara",
+            "Lumen Field, Seattle"
+        ];
 
         const TEAMS_DATABASE = [
             { name: "Argentina", rating: 1850, code: "ar", group: "J" },
@@ -764,7 +670,6 @@
             { name: "Panama", rating: 1200, code: "pa", group: "K" }
         ];
 
-        // Real schedule mappings from world-cup-2026-team-schedules.csv
         const SCHEDULE_FIXTURES = [
             { matchId: 19, group: "J", team1: "Algeria", team2: "Argentina", venue: "Kansas City Stadium", date: "2026-06-17T01:00:00Z" },
             { matchId: 44, group: "J", team1: "Algeria", team2: "Jordan", venue: "San Francisco Bay Area Stadium", date: "2026-06-23T03:00:00Z" },
@@ -798,7 +703,6 @@
             analyticsTeams: null
         };
 
-        // ZERO BASELINE STORE INITIALIZATION
         function getAnalyticsStore() {
             const defaults = {
                 pageViews: 0,
@@ -818,7 +722,7 @@
         function saveAnalyticsStore(data) {
             localStorage.setItem('wc26_analytics_metrics', JSON.stringify(data));
             if (isFirebaseActive && dbRef) {
-                dbRef.set(data);
+                try { dbRef.set(data); } catch(e) {}
             }
         }
 
@@ -846,7 +750,7 @@
         function trackSimulationRun(count = 10000) {
             const data = getAnalyticsStore();
             data.simRunsCount += count;
-            logUserActivity(`Executed ${count.toLocaleString()} Monte Carlo simulations`);
+            logUserActivity(`Executed ${count.toLocaleString()} simulations`);
             saveAnalyticsStore(data);
         }
 
@@ -919,7 +823,7 @@
                 const top = sortedTeams[0];
                 document.getElementById('kpiTopTeam').innerText = top[0];
                 const totalClicks = Object.values(data.teamClicks).reduce((a,b)=>a+b, 0) || 1;
-                document.getElementById('kpiTopTeamViews').innerText = `${top[1]} selections (${((top[1]/totalClicks)*100).toFixed(1)}%)`;
+                document.getElementById('kpiTopTeamViews').innerText = `${top[1]} views (${((top[1]/totalClicks)*100).toFixed(0)}%)`;
             } else {
                 document.getElementById('kpiTopTeam').innerText = "None";
                 document.getElementById('kpiTopTeamViews').innerText = "0 selections";
@@ -929,18 +833,18 @@
             const engagementContainer = document.getElementById('tabEngagementBars');
             engagementContainer.innerHTML = '';
 
-            const tabNames = { pitch: "Tactical Pitch Visualizer", simulator: "Monte Carlo Match Engine", groups: "Group Stage & Schedules", h2h: "Head-to-Head Comparison", analytics: "Admin Analytics" };
+            const tabNames = { pitch: "Tactical Pitch Visualizer", simulator: "Monte Carlo Simulator", groups: "Group Stage & Schedules", h2h: "Head-to-Head Comparison", analytics: "Admin Analytics" };
             Object.entries(data.tabEngagement).forEach(([key, val]) => {
-                const pct = ((val / totalTabClicks) * 100).toFixed(1);
+                const pct = ((val / totalTabClicks) * 100).toFixed(0);
                 const item = document.createElement('div');
                 item.className = "space-y-1";
                 item.innerHTML = `
-                    <div class="flex justify-between font-semibold">
+                    <div class="flex justify-between text-xs font-semibold">
                         <span class="text-slate-300">${tabNames[key] || key}</span>
-                        <span class="text-cyan-400">${pct}% (${val} views)</span>
+                        <span class="text-sky-400">${pct}% (${val})</span>
                     </div>
-                    <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                        <div class="bg-gradient-to-r from-cyan-500 to-blue-500 h-full" style="width: ${pct}%"></div>
+                    <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                        <div class="bg-sky-400 h-full" style="width: ${pct}%"></div>
                     </div>
                 `;
                 engagementContainer.appendChild(item);
@@ -949,14 +853,14 @@
             const streamContainer = document.getElementById('adminActivityStream');
             streamContainer.innerHTML = '';
             if (data.activityLog.length === 0) {
-                streamContainer.innerHTML = `<div class="text-slate-500 text-center py-4">No events logged yet. Perform actions to see live activity.</div>`;
+                streamContainer.innerHTML = `<div class="text-slate-500 text-center py-3">No events logged yet.</div>`;
             } else {
                 data.activityLog.forEach(log => {
                     const div = document.createElement('div');
-                    div.className = "bg-slate-900/80 px-3 py-2 rounded-xl border border-slate-800/80 flex items-center justify-between";
+                    div.className = "bg-slate-900 px-2.5 py-1.5 rounded-lg border border-slate-800 flex items-center justify-between";
                     div.innerHTML = `
-                        <span class="text-slate-300 font-medium">${log.text}</span>
-                        <span class="text-[10px] text-slate-500 whitespace-nowrap ml-2">${log.time}</span>
+                        <span class="text-slate-300 font-medium truncate">${log.text}</span>
+                        <span class="text-[10px] text-slate-500 whitespace-nowrap ml-2 font-mono">${log.time}</span>
                     `;
                     streamContainer.appendChild(div);
                 });
@@ -968,12 +872,12 @@
             charts.analyticsTraffic = new Chart(ctxT, {
                 type: 'line',
                 data: {
-                    labels: ['Start', 'Current Session'],
+                    labels: ['Start', 'Current'],
                     datasets: [{
-                        label: 'Real-Time Sessions',
+                        label: 'Sessions',
                         data: [0, data.pageViews],
-                        borderColor: '#facc15',
-                        backgroundColor: 'rgba(250, 204, 21, 0.12)',
+                        borderColor: '#fbbf24',
+                        backgroundColor: 'rgba(251, 191, 36, 0.1)',
                         fill: true,
                         tension: 0.2
                     }]
@@ -982,8 +886,8 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-                        y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true }
+                        x: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.03)' } },
+                        y: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.03)' }, beginAtZero: true }
                     },
                     plugins: { legend: { display: false } }
                 }
@@ -998,10 +902,10 @@
                 data: {
                     labels: top5.length > 0 ? top5.map(t => t[0]) : ['No Data'],
                     datasets: [{
-                        label: 'User Views',
+                        label: 'Views',
                         data: top5.length > 0 ? top5.map(t => t[1]) : [0],
                         backgroundColor: '#38bdf8',
-                        borderRadius: 6
+                        borderRadius: 4
                     }]
                 },
                 options: {
@@ -1009,8 +913,8 @@
                     maintainAspectRatio: false,
                     indexAxis: 'y',
                     scales: {
-                        x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true },
-                        y: { ticks: { color: '#cbd5e1' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                        x: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.03)' }, beginAtZero: true },
+                        y: { ticks: { color: '#cbd5e1' }, grid: { color: 'rgba(255,255,255,0.03)' } }
                     },
                     plugins: { legend: { display: false } }
                 }
@@ -1034,19 +938,19 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = `wc26_realtime_analytics_${Date.now()}.json`;
+            a.download = `wc26_analytics_${Date.now()}.json`;
             a.click();
             URL.revokeObjectURL(url);
-            showToast("Exported live analytics JSON!");
+            showToast("Exported analytics JSON!");
         }
 
         function resetAnalyticsData() {
-            if (confirm("Are you sure you want to reset all tracked real-time metrics to 0?")) {
+            if (confirm("Reset all tracked analytics metrics?")) {
                 localStorage.removeItem('wc26_analytics_metrics');
                 if (isFirebaseActive && dbRef) {
-                    dbRef.remove();
+                    try { dbRef.remove(); } catch(e) {}
                 }
-                showToast("All metrics reset to 0!");
+                showToast("Analytics reset!");
                 renderAnalyticsTab();
             }
         }
@@ -1188,17 +1092,19 @@
             const scaleX = x => (x / 120) * w;
             const scaleY = y => (y / 80) * h;
 
-            ctx.fillStyle = '#0f172a';
+            // Pitch Background
+            ctx.fillStyle = '#0a1120';
             ctx.fillRect(0, 0, w, h);
 
             const stripeWidth = w / 12;
-            ctx.fillStyle = '#111c35';
+            ctx.fillStyle = '#0d172a';
             for (let i = 0; i < 12; i += 2) {
                 ctx.fillRect(i * stripeWidth, 0, stripeWidth, h);
             }
 
-            ctx.strokeStyle = '#334155';
-            ctx.lineWidth = 2;
+            // Pitch Lines
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1.5;
 
             ctx.strokeRect(scaleX(2), scaleY(2), scaleX(116), scaleY(76));
 
@@ -1211,9 +1117,9 @@
             ctx.arc(scaleX(60), scaleY(40), scaleX(9.15), 0, 2 * Math.PI);
             ctx.stroke();
 
-            ctx.fillStyle = '#334155';
+            ctx.fillStyle = '#1e293b';
             ctx.beginPath();
-            ctx.arc(scaleX(60), scaleY(40), 3, 0, 2 * Math.PI);
+            ctx.arc(scaleX(60), scaleY(40), 2.5, 0, 2 * Math.PI);
             ctx.fill();
 
             ctx.strokeRect(scaleX(2), scaleY(18), scaleX(18), scaleY(44));
@@ -1222,11 +1128,8 @@
             ctx.strokeRect(scaleX(2), scaleY(30), scaleX(6), scaleY(20));
             ctx.strokeRect(scaleX(112), scaleY(30), scaleX(6), scaleY(20));
 
-            ctx.strokeRect(scaleX(0.5), scaleY(34), scaleX(1.5), scaleY(12));
-            ctx.strokeRect(scaleX(118), scaleY(34), scaleX(1.5), scaleY(12));
-
             if (state.pitchMode === 'heatmap') {
-                renderHeatmapOverlay(ctx, w, h, scaleX, scaleY);
+                renderHeatmapOverlay(ctx, scaleX, scaleY);
             } else if (state.pitchMode === 'passes') {
                 renderPassVectorsOverlay(ctx, scaleX, scaleY);
             } else if (state.pitchMode === 'shots') {
@@ -1234,37 +1137,37 @@
             }
         }
 
-        function renderHeatmapOverlay(ctx, w, h, scaleX, scaleY) {
+        function renderHeatmapOverlay(ctx, scaleX, scaleY) {
             const passes = state.telemetry.passes;
             passes.forEach(p => {
                 const grad = ctx.createRadialGradient(
-                    scaleX(p.x), scaleY(p.y), 2,
-                    scaleX(p.x), scaleY(p.y), scaleX(14)
+                    scaleX(p.x), scaleY(p.y), 1,
+                    scaleX(p.x), scaleY(p.y), scaleX(12)
                 );
-                grad.addColorStop(0, 'rgba(56, 189, 248, 0.18)');
-                grad.addColorStop(0.5, 'rgba(168, 85, 247, 0.08)');
-                grad.addColorStop(1, 'rgba(15, 23, 42, 0)');
+                grad.addColorStop(0, 'rgba(56, 189, 248, 0.22)');
+                grad.addColorStop(0.6, 'rgba(14, 165, 233, 0.08)');
+                grad.addColorStop(1, 'rgba(10, 17, 32, 0)');
 
                 ctx.fillStyle = grad;
                 ctx.beginPath();
-                ctx.arc(scaleX(p.x), scaleY(p.y), scaleX(14), 0, 2 * Math.PI);
+                ctx.arc(scaleX(p.x), scaleY(p.y), scaleX(12), 0, 2 * Math.PI);
                 ctx.fill();
             });
 
             document.getElementById('pitchLegend').innerHTML = `
-                <div class="flex items-center space-x-2">
-                    <span class="w-3 h-3 rounded-full bg-cyan-400"></span>
-                    <span>High Density Activity Corridor</span>
+                <div class="flex items-center space-x-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span>
+                    <span>High Activity Density</span>
                 </div>
             `;
         }
 
         function renderPassVectorsOverlay(ctx, scaleX, scaleY) {
-            const passes = state.telemetry.passes.slice(0, 65);
+            const passes = state.telemetry.passes.slice(0, 60);
             passes.forEach(p => {
                 const isForward = p.endX > p.x + 3;
-                ctx.strokeStyle = isForward ? 'rgba(56, 189, 248, 0.75)' : 'rgba(148, 163, 184, 0.4)';
-                ctx.lineWidth = isForward ? 1.8 : 1;
+                ctx.strokeStyle = isForward ? 'rgba(56, 189, 248, 0.7)' : 'rgba(100, 116, 139, 0.35)';
+                ctx.lineWidth = isForward ? 1.5 : 1;
 
                 ctx.beginPath();
                 ctx.moveTo(scaleX(p.x), scaleY(p.y));
@@ -1273,14 +1176,14 @@
 
                 ctx.fillStyle = ctx.strokeStyle;
                 ctx.beginPath();
-                ctx.arc(scaleX(p.endX), scaleY(p.endY), 2.5, 0, 2 * Math.PI);
+                ctx.arc(scaleX(p.endX), scaleY(p.endY), 2, 0, 2 * Math.PI);
                 ctx.fill();
             });
 
             document.getElementById('pitchLegend').innerHTML = `
                 <div class="flex items-center space-x-3">
-                    <span class="flex items-center"><span class="w-3 h-0.5 bg-cyan-400 mr-1"></span> Progressive Pass</span>
-                    <span class="flex items-center"><span class="w-3 h-0.5 bg-slate-400 mr-1"></span> Lateral / Back</span>
+                    <span class="flex items-center"><span class="w-2.5 h-0.5 bg-sky-400 mr-1"></span> Forward Pass</span>
+                    <span class="flex items-center"><span class="w-2.5 h-0.5 bg-slate-500 mr-1"></span> Lateral/Back</span>
                 </div>
             `;
         }
@@ -1288,25 +1191,21 @@
         function renderShotMapOverlay(ctx, scaleX, scaleY) {
             const shots = state.telemetry.shots;
             shots.forEach(s => {
-                const radius = Math.max(6, s.xg * 22);
+                const radius = Math.max(5, s.xg * 18);
 
                 if (s.isGoal) {
-                    ctx.fillStyle = '#facc15';
-                    ctx.shadowColor = '#facc15';
-                    ctx.shadowBlur = 12;
-
+                    ctx.fillStyle = '#fbbf24';
                     ctx.beginPath();
-                    ctx.arc(scaleX(s.x), scaleY(s.y), radius + 2, 0, 2 * Math.PI);
+                    ctx.arc(scaleX(s.x), scaleY(s.y), radius + 1.5, 0, 2 * Math.PI);
                     ctx.fill();
 
-                    ctx.shadowBlur = 0;
                     ctx.strokeStyle = '#000';
-                    ctx.lineWidth = 1.5;
+                    ctx.lineWidth = 1;
                     ctx.stroke();
                 } else {
                     ctx.strokeStyle = '#f87171';
-                    ctx.lineWidth = 2;
-                    ctx.fillStyle = 'rgba(248, 113, 113, 0.2)';
+                    ctx.lineWidth = 1.5;
+                    ctx.fillStyle = 'rgba(248, 113, 113, 0.15)';
 
                     ctx.beginPath();
                     ctx.arc(scaleX(s.x), scaleY(s.y), radius, 0, 2 * Math.PI);
@@ -1317,8 +1216,8 @@
 
             document.getElementById('pitchLegend').innerHTML = `
                 <div class="flex items-center space-x-3">
-                    <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-amber-400 mr-1"></span> Goal (Size = xG)</span>
-                    <span class="flex items-center"><span class="w-3 h-3 rounded-full border border-red-400 bg-red-500/20 mr-1"></span> Miss / Saved</span>
+                    <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 mr-1"></span> Goal</span>
+                    <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-full border border-red-400 mr-1"></span> Saved/Miss</span>
                 </div>
             `;
         }
@@ -1335,17 +1234,19 @@
 
             state.telemetry = generatePitchTelemetry(state.currentTeamName, state.currentOpponentName, state.tactic);
 
-            document.getElementById('pitchCanvasTitle').innerText = `${state.currentTeamName} - Tactical Pitch Telemetry vs ${state.currentOpponentName}`;
+            document.getElementById('pitchCanvasTitle').innerText = `${state.currentTeamName} vs ${state.currentOpponentName}`;
             
             document.getElementById('statPassCount').innerText = state.telemetry.passes.length;
             const avgAcc = (84 + (getTeam(state.currentTeamName).rating - 1500) / 40).toFixed(1);
             document.getElementById('statPassAcc').innerText = `${Math.min(94, Math.max(72, avgAcc))}%`;
 
             const totalXg = state.telemetry.shots.reduce((acc, s) => acc + s.xg, 0).toFixed(2);
-            document.getElementById('statShotsXg').innerText = `${state.telemetry.shots.length} (${totalXg} xG)`;
+            document.getElementById('statShotsXg').innerText = totalXg;
 
-            document.getElementById('insightDominance').innerText = `${state.currentTeamName} controls ${(52 + (getTeam(state.currentTeamName).rating - getTeam(state.currentOpponentName).rating) / 20).toFixed(0)}% of progression vector corridors in the final third.`;
-            
+            document.getElementById('insightDominance').innerText = `${state.currentTeamName} controls ${(52 + (getTeam(state.currentTeamName).rating - getTeam(state.currentOpponentName).rating) / 20).toFixed(0)}% of attack progression corridors.`;
+            document.getElementById('insightShots').innerText = `Created ${state.telemetry.shots.length} chances with an expected goal quality of ${totalXg} xG.`;
+            document.getElementById('insightVulnerability').innerText = `Defensive rest shape retains a clean 3-2 structure during build-up phases.`;
+
             renderPitchCanvas();
         }
 
@@ -1354,9 +1255,9 @@
             ['heatmap', 'passes', 'shots'].forEach(m => {
                 const btn = document.getElementById(`mode-${m}`);
                 if (m === mode) {
-                    btn.className = "flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center space-x-1.5 bg-cyan-500 text-slate-950 shadow-md";
+                    btn.className = "flex-1 md:flex-none py-1.5 px-3 rounded-lg text-xs font-semibold transition flex items-center justify-center space-x-1.5 bg-sky-500 text-slate-950";
                 } else {
-                    btn.className = "flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center justify-center space-x-1.5 text-slate-400 hover:text-white hover:bg-slate-800";
+                    btn.className = "flex-1 md:flex-none py-1.5 px-3 rounded-lg text-xs font-semibold transition flex items-center justify-center space-x-1.5 text-slate-400 hover:text-white hover:bg-slate-800";
                 }
             });
             renderPitchCanvas();
@@ -1377,41 +1278,41 @@
             simResults.forEach((res, idx) => {
                 const matchInfo = SCHEDULE_FIXTURES.find(f => (f.team1 === res.team1.name && f.team2 === res.team2.name) || (f.team2 === res.team1.name && f.team1 === res.team2.name)) || { venue: HOST_VENUES[idx % HOST_VENUES.length] };
                 const card = document.createElement('div');
-                card.className = "glass-card p-4 rounded-2xl border border-slate-800 space-y-3";
+                card.className = "bg-slate-900 p-3.5 rounded-xl border border-slate-800 space-y-2.5";
                 card.innerHTML = `
-                    <div class="flex items-center justify-between text-xs text-slate-400">
-                        <span>Match ${idx + 1} • Group Stage</span>
-                        <span class="text-cyan-400 font-semibold">${matchInfo.venue}</span>
+                    <div class="flex items-center justify-between text-[11px] text-slate-400">
+                        <span>Match ${idx + 1}</span>
+                        <span class="text-sky-400 truncate max-w-[150px]">${matchInfo.venue}</span>
                     </div>
                     
-                    <div class="flex items-center justify-between font-bold text-sm">
-                        <div class="flex items-center space-x-2">
-                            <img src="https://flagcdn.com/w40/${res.team1.code}.png" class="w-5 h-3.5 object-cover rounded-sm" alt="flag">
+                    <div class="flex items-center justify-between font-bold text-xs">
+                        <div class="flex items-center space-x-1.5">
+                            <img src="https://flagcdn.com/w40/${res.team1.code}.png" class="w-4 h-3 object-cover rounded-sm" alt="flag">
                             <span>${res.team1.name}</span>
                         </div>
-                        <span class="text-slate-500">vs</span>
-                        <div class="flex items-center space-x-2">
+                        <span class="text-slate-500 text-[10px]">VS</span>
+                        <div class="flex items-center space-x-1.5">
                             <span>${res.team2.name}</span>
-                            <img src="https://flagcdn.com/w40/${res.team2.code}.png" class="w-5 h-3.5 object-cover rounded-sm" alt="flag">
+                            <img src="https://flagcdn.com/w40/${res.team2.code}.png" class="w-4 h-3 object-cover rounded-sm" alt="flag">
                         </div>
                     </div>
 
                     <div class="space-y-1">
-                        <div class="h-2.5 w-full bg-slate-800 rounded-full overflow-hidden flex">
-                            <div style="width: ${res.win1Pct}%" class="bg-emerald-400" title="Win: ${res.win1Pct}%"></div>
-                            <div style="width: ${res.drawPct}%" class="bg-amber-400" title="Draw: ${res.drawPct}%"></div>
-                            <div style="width: ${res.win2Pct}%" class="bg-red-400" title="Loss: ${res.win2Pct}%"></div>
+                        <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden flex">
+                            <div style="width: ${res.win1Pct}%" class="bg-emerald-400"></div>
+                            <div style="width: ${res.drawPct}%" class="bg-amber-400"></div>
+                            <div style="width: ${res.win2Pct}%" class="bg-red-400"></div>
                         </div>
-                        <div class="flex items-center justify-between text-[11px] font-semibold">
+                        <div class="flex items-center justify-between text-[10px] font-semibold">
                             <span class="text-emerald-400">Win ${res.win1Pct}%</span>
                             <span class="text-amber-400">Draw ${res.drawPct}%</span>
                             <span class="text-red-400">Loss ${res.win2Pct}%</span>
                         </div>
                     </div>
 
-                    <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
-                        <span>Exp Goals: <strong class="text-white">${res.expG1} - ${res.expG2}</strong></span>
-                        <span>Top Score: <strong class="text-cyan-400">${res.topScorelines[0].score}</strong></span>
+                    <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400">
+                        <span>Exp: <strong class="text-white">${res.expG1} - ${res.expG2}</strong></span>
+                        <span>Likely: <strong class="text-sky-400">${res.topScorelines[0].score}</strong></span>
                     </div>
                 `;
                 cardsContainer.appendChild(card);
@@ -1421,14 +1322,14 @@
             scoreMatrixList.innerHTML = '';
             simResults[0].topScorelines.forEach(item => {
                 const row = document.createElement('div');
-                row.className = "flex items-center justify-between bg-slate-900/80 px-3 py-2 rounded-xl border border-slate-800";
+                row.className = "flex items-center justify-between bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800";
                 row.innerHTML = `
                     <span class="font-bold text-white">Score: ${item.score}</span>
                     <div class="flex items-center space-x-2">
-                        <div class="w-20 bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                        <div class="w-16 bg-slate-800 rounded-full h-1 overflow-hidden">
                             <div class="bg-amber-400 h-full" style="width: ${Math.min(100, item.pct * 4)}%"></div>
                         </div>
-                        <span class="font-bold text-amber-400 w-10 text-right">${item.pct}%</span>
+                        <span class="font-bold text-amber-400 text-[11px] w-8 text-right">${item.pct}%</span>
                     </div>
                 `;
                 scoreMatrixList.appendChild(row);
@@ -1453,20 +1354,20 @@
                 data: {
                     labels: labels,
                     datasets: [
-                        { label: 'Win %', data: wins, backgroundColor: '#4ade80', borderRadius: 6 },
-                        { label: 'Draw %', data: draws, backgroundColor: '#facc15', borderRadius: 6 },
-                        { label: 'Loss %', data: losses, backgroundColor: '#f87171', borderRadius: 6 }
+                        { label: 'Win %', data: wins, backgroundColor: '#34d399', borderRadius: 4 },
+                        { label: 'Draw %', data: draws, backgroundColor: '#fbbf24', borderRadius: 4 },
+                        { label: 'Loss %', data: losses, backgroundColor: '#f87171', borderRadius: 4 }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { labels: { color: '#94a3b8', font: { family: 'Inter', size: 11 } } }
+                        legend: { labels: { color: '#94a3b8', font: { family: 'Inter', size: 10 } } }
                     },
                     scales: {
-                        x: { ticks: { color: '#cbd5e1' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-                        y: { ticks: { color: '#cbd5e1' }, grid: { color: 'rgba(255,255,255,0.05)' }, max: 100 }
+                        x: { ticks: { color: '#cbd5e1', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.03)' } },
+                        y: { ticks: { color: '#cbd5e1', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.03)' }, max: 100 }
                     }
                 }
             });
@@ -1483,30 +1384,30 @@
                     labels: ['0 Goals', '1 Goal', '2 Goals', '3 Goals', '4 Goals', '5 Goals', '6+ Goals'],
                     datasets: [
                         {
-                            label: `${firstMatchRes.team1.name} Goals Scored (%)`,
+                            label: `${firstMatchRes.team1.name} Goals (%)`,
                             data: firstMatchRes.goals1Hist.slice(0, 7),
                             borderColor: '#38bdf8',
-                            backgroundColor: 'rgba(56, 189, 248, 0.15)',
+                            backgroundColor: 'rgba(56, 189, 248, 0.1)',
                             fill: true,
-                            tension: 0.4
+                            tension: 0.3
                         },
                         {
-                            label: `${firstMatchRes.team2.name} Goals Scored (%)`,
+                            label: `${firstMatchRes.team2.name} Goals (%)`,
                             data: firstMatchRes.goals2Hist.slice(0, 7),
                             borderColor: '#f87171',
-                            backgroundColor: 'rgba(248, 113, 113, 0.15)',
+                            backgroundColor: 'rgba(248, 113, 113, 0.1)',
                             fill: true,
-                            tension: 0.4
+                            tension: 0.3
                         }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { labels: { color: '#94a3b8' } } },
+                    plugins: { legend: { labels: { color: '#94a3b8', font: { size: 10 } } } },
                     scales: {
-                        x: { ticks: { color: '#cbd5e1' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-                        y: { ticks: { color: '#cbd5e1' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                        x: { ticks: { color: '#cbd5e1', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.03)' } },
+                        y: { ticks: { color: '#cbd5e1', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.03)' } }
                     }
                 }
             });
@@ -1516,7 +1417,7 @@
             const filterSelect = document.getElementById('groupFilterSelect');
             const selectedGroup = filterSelect.value === 'ALL' ? getTeam(state.currentTeamName).group : filterSelect.value;
 
-            document.getElementById('groupTableTitle').innerHTML = `<span>Group ${selectedGroup} Standings Projections</span>`;
+            document.getElementById('groupTableTitle').innerText = `Group ${selectedGroup} Standings Projections`;
 
             const groupTeams = TEAMS_DATABASE.filter(t => t.group === selectedGroup);
 
@@ -1556,23 +1457,21 @@
 
             sortedStandings.forEach((row, idx) => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-800/40 transition";
+                tr.className = "hover:bg-slate-900/60 transition";
                 const gd = row.gf - row.ga;
-                const advPct = idx === 0 ? "98%" : (idx === 1 ? "84%" : (idx === 2 ? "42%" : "8%"));
 
                 tr.innerHTML = `
-                    <td class="py-3 px-3 flex items-center space-x-2 font-bold text-white">
-                        <span class="text-slate-500 w-4 text-center">${idx + 1}</span>
-                        <img src="https://flagcdn.com/w40/${row.team.code}.png" class="w-4 h-3 object-cover rounded-sm" alt="flag">
-                        <span>${row.team.name}</span>
+                    <td class="py-2.5 px-2 flex items-center space-x-1.5 font-bold text-white">
+                        <span class="text-slate-500 text-[10px] w-3">${idx + 1}</span>
+                        <img src="https://flagcdn.com/w40/${row.team.code}.png" class="w-3.5 h-2.5 object-cover rounded-sm" alt="flag">
+                        <span class="truncate">${row.team.name}</span>
                     </td>
-                    <td class="text-center text-slate-400 font-mono">${row.team.rating}</td>
+                    <td class="text-center text-slate-400 font-mono text-[11px]">${row.team.rating}</td>
                     <td class="text-center text-slate-300">${row.mp}</td>
-                    <td class="text-center text-slate-300 font-mono">${row.w}-${row.d}-${row.l}</td>
-                    <td class="text-center text-slate-400 font-mono">${row.gf}:${row.ga}</td>
-                    <td class="text-center font-mono ${gd >= 0 ? 'text-emerald-400' : 'text-red-400'}">${gd > 0 ? '+' + gd : gd}</td>
-                    <td class="text-center font-black text-cyan-400 text-sm">${row.pts}</td>
-                    <td class="text-center font-bold text-emerald-400">${advPct}</td>
+                    <td class="text-center text-slate-300 font-mono text-[11px]">${row.w}-${row.d}-${row.l}</td>
+                    <td class="text-center text-slate-400 font-mono text-[11px]">${row.gf}:${row.ga}</td>
+                    <td class="text-center font-mono text-[11px] ${gd >= 0 ? 'text-emerald-400' : 'text-red-400'}">${gd > 0 ? '+' + gd : gd}</td>
+                    <td class="text-center font-bold text-sky-400">${row.pts}</td>
                 `;
                 tableBody.appendChild(tr);
             });
@@ -1582,23 +1481,23 @@
 
             for (let i = 0; i < groupTeams.length; i++) {
                 for (let j = i + 1; j < groupTeams.length; j++) {
-                    const matchInfo = SCHEDULE_FIXTURES.find(f => (f.team1 === groupTeams[i].name && f.team2 === groupTeams[j].name) || (f.team2 === groupTeams[i].name && f.team1 === groupTeams[j].name)) || { venue: "Host Venue", date: "June 2026" };
+                    const matchInfo = SCHEDULE_FIXTURES.find(f => (f.team1 === groupTeams[i].name && f.team2 === groupTeams[j].name) || (f.team2 === groupTeams[i].name && f.team1 === groupTeams[j].name)) || { venue: HOST_VENUES[(i + j) % HOST_VENUES.length] };
                     const fCard = document.createElement('div');
-                    fCard.className = "bg-slate-900/80 p-3 rounded-2xl border border-slate-800 space-y-2 text-xs";
+                    fCard.className = "bg-slate-900 p-2.5 rounded-lg border border-slate-800 space-y-1.5 text-xs";
                     fCard.innerHTML = `
-                        <div class="flex items-center justify-between text-[11px] text-slate-400">
-                            <span>June 2026 • Group Stage</span>
-                            <span class="text-cyan-400">${matchInfo.venue}</span>
+                        <div class="flex items-center justify-between text-[10px] text-slate-400">
+                            <span>June 2026</span>
+                            <span class="text-sky-400 truncate max-w-[150px]">${matchInfo.venue}</span>
                         </div>
                         <div class="flex items-center justify-between font-bold">
-                            <div class="flex items-center space-x-2">
-                                <img src="https://flagcdn.com/w40/${groupTeams[i].code}.png" class="w-4 h-3 rounded-sm" alt="flag">
+                            <div class="flex items-center space-x-1.5">
+                                <img src="https://flagcdn.com/w40/${groupTeams[i].code}.png" class="w-3.5 h-2.5 rounded-sm" alt="flag">
                                 <span>${groupTeams[i].name}</span>
                             </div>
-                            <span class="text-slate-500 text-[10px] px-2 py-0.5 rounded bg-slate-800">VS</span>
-                            <div class="flex items-center space-x-2">
+                            <span class="text-slate-500 text-[9px] px-1.5 py-0.5 rounded bg-slate-950">VS</span>
+                            <div class="flex items-center space-x-1.5">
                                 <span>${groupTeams[j].name}</span>
-                                <img src="https://flagcdn.com/w40/${groupTeams[j].code}.png" class="w-4 h-3 rounded-sm" alt="flag">
+                                <img src="https://flagcdn.com/w40/${groupTeams[j].code}.png" class="w-3.5 h-2.5 rounded-sm" alt="flag">
                             </div>
                         </div>
                     `;
@@ -1608,8 +1507,8 @@
         }
 
         function simulateAllTournamentGroups() {
-            logUserActivity("Simulated all 72 Group Stage matches across 12 groups");
-            showToast("Simulated all 72 Group Stage matches across 12 groups!");
+            logUserActivity("Simulated group stage fixtures");
+            showToast("Simulated Group Stage matches!");
             renderGroupStageView();
         }
 
@@ -1643,10 +1542,10 @@
             charts.h2hDonut = new Chart(ctxD, {
                 type: 'doughnut',
                 data: {
-                    labels: [`${res.team1.name} Win`, 'Draw', `${res.team2.name} Win`],
+                    labels: [`${res.team1.name}`, 'Draw', `${res.team2.name}`],
                     datasets: [{
                         data: [parseFloat(res.win1Pct), parseFloat(res.drawPct), parseFloat(res.win2Pct)],
-                        backgroundColor: ['#38bdf8', '#facc15', '#a855f7'],
+                        backgroundColor: ['#38bdf8', '#fbbf24', '#a855f7'],
                         borderWidth: 0
                     }]
                 },
@@ -1654,7 +1553,7 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
-                    cutout: '72%'
+                    cutout: '70%'
                 }
             });
 
@@ -1667,19 +1566,19 @@
             charts.h2hRadar = new Chart(ctxR, {
                 type: 'radar',
                 data: {
-                    labels: ['FIFA Rating', 'Attacking Power', 'Midfield Control', 'Defensive Structure', 'Set Piece Threat'],
+                    labels: ['Elo Rating', 'Attacking', 'Midfield', 'Defensive', 'Set Piece'],
                     datasets: [
                         {
                             label: res.team1.name,
                             data: [rA / 20, rA / 19.5, rA / 20.2, rA / 20, rA / 21],
                             borderColor: '#38bdf8',
-                            backgroundColor: 'rgba(56, 189, 248, 0.2)'
+                            backgroundColor: 'rgba(56, 189, 248, 0.15)'
                         },
                         {
                             label: res.team2.name,
                             data: [rB / 20, rB / 19.5, rB / 20.2, rB / 20, rB / 21],
                             borderColor: '#a855f7',
-                            backgroundColor: 'rgba(168, 85, 247, 0.2)'
+                            backgroundColor: 'rgba(168, 85, 247, 0.15)'
                         }
                     ]
                 },
@@ -1688,13 +1587,13 @@
                     maintainAspectRatio: false,
                     scales: {
                         r: {
-                            angleLines: { color: 'rgba(255,255,255,0.1)' },
-                            grid: { color: 'rgba(255,255,255,0.1)' },
-                            pointLabels: { color: '#cbd5e1', font: { size: 10 } },
+                            angleLines: { color: 'rgba(255,255,255,0.08)' },
+                            grid: { color: 'rgba(255,255,255,0.08)' },
+                            pointLabels: { color: '#94a3b8', font: { size: 9 } },
                             ticks: { display: false }
                         }
                     },
-                    plugins: { legend: { labels: { color: '#cbd5e1' } } }
+                    plugins: { legend: { labels: { color: '#cbd5e1', font: { size: 10 } } } }
                 }
             });
         }
@@ -1759,7 +1658,7 @@
             document.execCommand("copy");
             document.body.removeChild(dummy);
 
-            showToast("Match report copied to clipboard!");
+            showToast("Match report copied!");
         }
 
         window.onload = function () {
@@ -1798,7 +1697,6 @@
                 document.getElementById('selectedTeamFlag').classList.remove('hidden');
                 document.getElementById('selectedTeamFallbackIcon').classList.add('hidden');
                 document.getElementById('primaryTeamRatingVal').innerText = team.rating;
-                document.getElementById('primaryTeamGroupVal').innerText = `Group ${team.group}`;
 
                 regeneratePitchData();
             });
