@@ -5,7 +5,9 @@ An interactive data science and visualization suite designed to analyze, simulat
 This project combines a **Python data engine** (Monte Carlo simulations, statistical modeling, positional telemetry generation) with a **web dashboard** featuring an HTML5 pitch canvas, Chart.js visualizers, and dynamic group stage projections.
 
 ---
-
+## Live Web Preview:
+https://footballpredictionanalysis.netlify.app
+##
 ## 🌟 Key Features
 
 - **🎲 10,000-Run Monte Carlo Simulation Engine**:
